@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DermaLearn Pro | Atlas Kulit & Kedokteran Interaktif</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --glass-bg: rgba(10, 20, 40, 0.45);
+  --glass-border: rgba(100, 200, 255, 0.08);
+  --glass-highlight: rgba(100, 200, 255, 0.03);
+  --accent: #00d4ff;
+  --accent-2: #7c3aed;
+  --accent-glow: rgba(0, 212, 255, 0.3);
+  --text-1: #e0f2fe;
+  --text-2: #94a3b8;
+  --danger: #f43f5e;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --radius: 24px;
+  --radius-sm: 14px;
+  --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --bg-color: #020617;
+}
+
+[data-theme="ocean"] { --accent: #00d4ff; --accent-2: #7c3aed; --accent-glow: rgba(0, 212, 255, 0.3); }
+[data-theme="sunset"] { --accent: #ff7e5f; --accent-2: #feb47b; --accent-glow: rgba(255, 126, 95, 0.3); --glass-bg: rgba(40, 15, 20, 0.45); --bg-color: #1a0a0a; }
+[data-theme="forest"] { --accent: #4ade80; --accent-2: #22c55e; --accent-glow: rgba(74, 222, 128, 0.3); --glass-bg: rgba(10, 30, 20, 0.45); --bg-color: #051a10; }
+[data-theme="lavender"] { --accent: #c084fc; --accent-2: #a855f7; --accent-glow: rgba(192, 132, 252, 0.3); --glass-bg: rgba(30, 15, 40, 0.45); --bg-color: #120620; }
+[data-theme="peach"] { --accent: #fb7185; --accent-2: #f43f5e; --accent-glow: rgba(251, 113, 133, 0.3); --glass-bg: rgba(35, 10, 20, 0.45); --bg-color: #1a080e; }
+[data-theme="golden"] { --accent: #fbbf24; --accent-2: #f59e0b; --accent-glow: rgba(251, 191, 36, 0.3); --glass-bg: rgba(35, 25, 5, 0.45); --bg-color: #1a1405; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, var(--bg-color), #0f172a);
+  color: var(--text-1);
+  line-height: 1.7;
+  font-size: 15px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.6s ease;
+}
+
+#aquarium-canvas {
+  position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none;
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 var(--glass-highlight);
+  border-radius: var(--radius);
+}
+
+.glass-strong {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(100, 200, 255, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(124, 58, 237, 0.05));
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.glass-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 30px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.topbar {
+  position: fixed; top: 16px; left: 16px; right: 16px; height: 64px; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem; gap: 1rem;
+}
+
+.brand { display: flex; align-items: center; gap: 0.75rem; font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); cursor: pointer; }
+.brand svg { width: 32px; height: 32px; filter: drop-shadow(0 0 8px var(--accent-glow)); }
+
+.search-box { position: relative; flex: 1; max-width: 420px; }
+.search-box input {
+  width: 100%; padding: 0.7rem 1rem 0.7rem 2.8rem; border-radius: 50px; border: 1px solid var(--glass-border);
+  background: rgba(10, 20, 40, 0.6); color: var(--text-1); backdrop-filter: blur(10px); outline: none;
+  font-family: inherit; font-size: 0.9rem; transition: var(--transition);
+}
+.search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.search-box input::placeholder { color: var(--text-2); }
+.search-box svg { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: var(--text-2); fill: none; stroke-width: 2; }
+
+.top-controls { display: flex; align-items: center; gap: 0.5rem; }
+.icon-btn {
+  width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--glass-border);
+  background: rgba(10, 20, 40, 0.5); color: var(--text-1); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: var(--transition);
+  backdrop-filter: blur(10px); position: relative; overflow: hidden; font-size: 1.1rem;
+}
+.icon-btn::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, var(--accent-glow), transparent 70%); opacity: 0; transition: opacity 0.3s; }
+.icon-btn:hover::before { opacity: 1; }
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.08); box-shadow: 0 0 20px var(--accent-glow); }
+.icon-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+
+.music-bar { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
+.music-bar span { width: 3px; background: var(--accent); border-radius: 2px; animation: musicWave 1s ease-in-out infinite; box-shadow: 0 0 4px var(--accent-glow); }
+.music-bar span:nth-child(1) { animation-delay: 0s; height: 30%; }
+.music-bar span:nth-child(2) { animation-delay: 0.15s; height: 60%; }
+.music-bar span:nth-child(3) { animation-delay: 0.3s; height: 45%; }
+.music-bar span:nth-child(4) { animation-delay: 0.45s; height: 75%; }
+.music-bar.paused span { animation-play-state: paused; height: 15% !important; box-shadow: none; }
+
+@keyframes musicWave { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+
+.sidebar {
+  position: fixed; top: 96px; left: 16px; bottom: 16px; width: 280px; padding: 1.25rem;
+  overflow-y: auto; z-index: 900; transform: translateX(0); transition: var(--transition);
+}
+.sidebar.hidden { transform: translateX(-300px); }
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+
+.nav-group { margin-bottom: 1.5rem; }
+.nav-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); margin-bottom: 0.6rem; font-weight: 600; opacity: 0.8; padding-left: 0.5rem; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0.8rem; border-radius: var(--radius-sm);
+  cursor: pointer; transition: var(--transition); margin-bottom: 0.3rem; color: var(--text-2);
+  font-size: 0.85rem; font-weight: 500; border: 1px solid transparent;
+}
+.nav-item:hover { background: var(--accent-glow); color: var(--accent); border-color: var(--glass-border); transform: translateX(4px); }
+.nav-item.active { background: linear-gradient(135deg, var(--accent-glow), rgba(124, 58, 237, 0.08)); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+.nav-item .nav-icon { font-size: 1.1rem; flex-shrink: 0; width: 24px; text-align: center; }
+
+.main-content { margin-left: 312px; padding: 100px 2rem 2rem; min-height: 100vh; transition: var(--transition); position: relative; z-index: 10; }
+
+.view { display: none; animation: fadeIn 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.view.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dashboard-hero { padding: 2.5rem; margin-bottom: 2rem; position: relative; overflow: hidden; }
+.dashboard-hero::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: radial-gradient(circle, var(--accent-glow), transparent 70%); border-radius: 50%; pointer-events: none; }
+.dashboard-hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--text-1), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
+.dashboard-hero p { color: var(--text-2); font-size: 1.1rem; max-width: 600px; }
+
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
+
+.stat-card { padding: 1.75rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
+.stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); opacity: 0.6; }
+.stat-num { font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 0.5rem; }
+.stat-label { color: var(--text-2); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.5px; }
+
+.challenge-card { padding: 1.5rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; border-radius: var(--radius); background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); }
+.challenge-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--warning), var(--accent)); }
+.challenge-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.challenge-header h3 { color: var(--warning); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+.challenge-streak { background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+.quick-stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.quick-stat { padding: 0.75rem 1.25rem; border-radius: var(--radius-sm); background: rgba(10, 20, 40, 0.4); border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; }
+.quick-stat .value { font-weight: 700; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+
+.recommendation-card { margin-top: 2rem; padding: 2rem; }
+.recommendation-card h3 { color: var(--accent); margin-bottom: 1.25rem; font-size: 1.1rem; font-weight: 700; }
+.recommendation-card ul { margin-left: 1.25rem; color: var(--text-2); line-height: 2; }
+.recommendation-card li { position: relative; padding-left: 0.5rem; }
+.recommendation-card li::marker { color: var(--accent); }
+
+.content-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+.content-header h1 { font-size: 1.9rem; font-weight: 700; background: linear-gradient(135deg, var(--text-1), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.content-area { max-width: 900px; }
+.content-area h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; color: var(--accent); font-weight: 700; display: flex; align-items: center; gap: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--glass-border); }
+.content-area h3 { font-size: 1.2rem; margin: 1.75rem 0 0.75rem; color: var(--accent-2); font-weight: 600; }
+.content-area h4 { font-size: 1.05rem; margin: 1.5rem 0 0.5rem; color: var(--text-1); font-weight: 600; }
+.content-area p { margin-bottom: 1.2rem; text-align: justify; color: var(--text-2); line-height: 1.8; }
+.content-area ul, .content-area ol { margin: 1rem 0 1rem 1.5rem; color: var(--text-2); }
+.content-area li { margin-bottom: 0.6rem; line-height: 1.7; }
+.content-area li::marker { color: var(--accent); }
+
+.medical-term { font-weight: 600; color: var(--accent); cursor: help; border-bottom: 1px dashed var(--accent); transition: var(--transition); }
+.medical-term:hover { background: var(--accent-glow); border-radius: 4px; padding: 0 3px; }
+
+.section-block { margin-bottom: 2.5rem; padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--glass-border); background: rgba(10, 20, 40, 0.3); transition: var(--transition); position: relative; }
+.section-block:hover { border-color: rgba(0, 212, 255, 0.15); background: rgba(10, 20, 40, 0.4); }
+
+.section-actions { display: flex; gap: 0.6rem; margin: 1rem 0; flex-wrap: wrap; }
+
+.pill-btn {
+  padding: 0.55rem 1.1rem; border-radius: 50px; border: 1px solid var(--glass-border);
+  background: rgba(10, 20, 40, 0.5); color: var(--text-1); cursor: pointer; font-size: 0.85rem;
+  font-weight: 500; display: inline-flex; align-items: center; gap: 0.4rem; transition: var(--transition);
+  font-family: inherit; backdrop-filter: blur(10px);
+}
+.pill-btn:hover { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); transform: translateY(-1px); }
+.pill-btn.primary { background: linear-gradient(135deg, var(--accent-glow), rgba(124, 58, 237, 0.15)); border-color: var(--accent); color: var(--accent); }
+
+.lang-toggle { display: inline-flex; background: rgba(10, 20, 40, 0.6); border-radius: 50px; padding: 0.3rem; border: 1px solid var(--glass-border); }
+.lang-toggle button { border: none; background: none; padding: 0.6rem 1.2rem; border-radius: 50px; cursor: pointer; color: var(--text-2); font-size: 0.85rem; font-weight: 500; transition: var(--transition); font-family: inherit; }
+.lang-toggle button.active { background: linear-gradient(135deg, var(--accent-glow), rgba(124, 58, 237, 0.15)); color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+
+.info-card { padding: 1.5rem; margin: 1rem 0; border-radius: var(--radius-sm); border-left: 4px solid var(--accent); background: var(--glass-bg); backdrop-filter: blur(10px); }
+.info-card.info { border-left-color: #3b82f6; }
+.info-card.warning { border-left-color: var(--warning); }
+.info-card.danger { border-left-color: var(--danger); }
+.info-card.success { border-left-color: var(--success); }
+.info-card-title { font-weight: 700; margin-bottom: 0.5rem; color: var(--text-1); }
+.info-card-body { color: var(--text-2); font-size: 0.95rem; line-height: 1.7; }
+
+.data-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; border-radius: var(--radius-sm); overflow: hidden; }
+.data-table th, .data-table td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--glass-border); }
+.data-table th { background: var(--accent-glow); color: var(--accent); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.data-table tr:hover { background: rgba(100, 200, 255, 0.03); }
+
+.breadcrumb { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; color: var(--text-2); font-size: 0.85rem; flex-wrap: wrap; }
+.breadcrumb a { color: var(--accent); text-decoration: none; cursor: pointer; }
+.breadcrumb a:hover { text-decoration: underline; }
+
+.quiz-card { padding: 2rem; margin: 1.5rem 0; position: relative; overflow: hidden; border-radius: var(--radius); background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); }
+.quiz-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--accent), var(--accent-2)); opacity: 0.5; }
+.quiz-question { font-weight: 700; font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--text-1); line-height: 1.6; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.75rem; }
+.quiz-option {
+  padding: 1rem 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border);
+  background: rgba(10, 20, 40, 0.4); cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; gap: 0.85rem; font-size: 0.95rem; color: var(--text-2);
+}
+.quiz-option:hover { border-color: var(--accent); background: var(--accent-glow); transform: translateX(6px); }
+.quiz-option .opt-letter { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--accent-glow); font-weight: 700; font-size: 0.9rem; color: var(--accent); flex-shrink: 0; border: 1px solid var(--accent); }
+.quiz-option.correct { border-color: var(--success); background: rgba(16, 185, 129, 0.1); color: #6ee7b7; }
+.quiz-option.correct .opt-letter { background: rgba(16, 185, 129, 0.2); color: var(--success); border-color: var(--success); }
+.quiz-option.wrong { border-color: var(--danger); background: rgba(244, 63, 94, 0.1); color: #fda4af; }
+.quiz-option.wrong .opt-letter { background: rgba(244, 63, 94, 0.2); color: var(--danger); border-color: var(--danger); }
+.quiz-option.disabled { pointer-events: none; opacity: 0.7; }
+.quiz-explanation { margin-top: 1.25rem; padding: 1.25rem; border-radius: var(--radius-sm); background: rgba(10, 20, 40, 0.6); border-left: 3px solid var(--accent); display: none; color: var(--text-2); font-size: 0.95rem; line-height: 1.7; }
+.quiz-explanation.show { display: block; animation: fadeIn 0.4s ease; }
+
+.flash-container { perspective: 1200px; max-width: 640px; margin: 2.5rem auto; height: 400px; position: relative; }
+.flash-card { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; }
+.flash-card.flipped { transform: rotateY(180deg); }
+.flash-front, .flash-back {
+  position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 2.5rem; text-align: center; border-radius: var(--radius); font-size: 1.15rem; line-height: 1.7;
+}
+.flash-front { background: linear-gradient(135deg, var(--accent-glow), rgba(124, 58, 237, 0.1)); border: 1px solid var(--glass-border); color: var(--text-1); font-weight: 600; font-size: 1.25rem; box-shadow: 0 0 40px var(--accent-glow); }
+.flash-back { background: rgba(15, 23, 42, 0.8); color: var(--text-1); transform: rotateY(180deg); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); overflow-y: auto; }
+.flash-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.flash-progress { text-align: center; color: var(--text-2); margin-top: 1.25rem; font-size: 0.9rem; font-weight: 500; }
+
+.exam-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.timer { font-size: 2.2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); background: rgba(10, 20, 40, 0.6); padding: 0.6rem 1.4rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 20px var(--accent-glow); letter-spacing: 2px; }
+.timer.warning { color: var(--warning); border-color: var(--warning); }
+.timer.danger { color: var(--danger); border-color: var(--danger); animation: pulse 1s infinite; }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+.exam-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.exam-nav button { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(10, 20, 40, 0.5); color: var(--text-1); cursor: pointer; font-weight: 600; transition: var(--transition); font-family: inherit; font-size: 0.9rem; }
+.exam-nav button:hover { border-color: var(--accent); background: var(--accent-glow); }
+.exam-nav button.active { border-color: var(--accent); background: linear-gradient(135deg, var(--accent-glow), rgba(124, 58, 237, 0.15)); color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+.exam-nav button.answered { border-color: var(--success); color: var(--success); background: rgba(16, 185, 129, 0.1); }
+.exam-nav button.flagged { position: relative; }
+.exam-nav button.flagged::after { content: ''; position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; box-shadow: 0 0 8px var(--danger); }
+
+.flag-btn { background: rgba(10, 20, 40, 0.5); border: 1px solid var(--glass-border); color: var(--text-1); padding: 0.7rem 1.4rem; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-family: inherit; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
+.flag-btn:hover { border-color: var(--warning); background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+
+.exam-result { text-align: center; padding: 3rem; max-width: 600px; margin: 0 auto; }
+.exam-result h2 { font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--text-1), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.score-circle { width: 160px; height: 160px; border-radius: 50%; margin: 2rem auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; background: conic-gradient(var(--accent) var(--score-deg), rgba(10, 20, 40, 0.8) 0); position: relative; box-shadow: 0 0 40px var(--accent-glow); }
+.score-circle::after { content: attr(data-score); position: absolute; width: 130px; height: 130px; background: var(--bg-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--accent); font-family: 'JetBrains Mono', monospace; border: 1px solid var(--glass-border); }
+
+.motivation-widget { padding: 1.5rem; margin: 1rem 0; text-align: center; position: relative; overflow: hidden; }
+.motivation-widget .quote-icon { font-size: 3rem; color: var(--accent); opacity: 0.3; line-height: 1; }
+.motivation-widget .quote-text { font-size: 1.15rem; font-style: italic; color: var(--text-1); margin: 1rem 0; line-height: 1.8; font-weight: 500; }
+.motivation-widget .quote-author { color: var(--accent); font-size: 0.9rem; font-weight: 600; }
+.motivation-widget .quote-day { position: absolute; top: 10px; right: 15px; background: var(--accent-glow); color: var(--accent); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+
+.meditation-container { max-width: 700px; margin: 2rem auto; text-align: center; padding: 2.5rem; }
+.meditation-visual { width: 250px; height: 250px; margin: 2rem auto; border-radius: 50%; background: radial-gradient(circle, var(--accent-glow), transparent 70%); display: flex; align-items: center; justify-content: center; position: relative; animation: breathe 8s ease-in-out infinite; }
+@keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.3); opacity: 1; } }
+.meditation-visual .inner-circle { width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; font-size: 3rem; box-shadow: 0 0 60px var(--accent-glow); }
+.meditation-timer { font-size: 4rem; font-weight: 800; color: var(--accent); font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 30px var(--accent-glow); margin: 1.5rem 0; }
+.meditation-status { color: var(--text-2); font-size: 1.1rem; margin-bottom: 2rem; }
+
+.theme-panel { position: fixed; top: 80px; right: 16px; width: 280px; padding: 1.5rem; z-index: 950; display: none; max-height: 80vh; overflow-y: auto; }
+.theme-panel.show { display: block; animation: fadeIn 0.3s ease; }
+.theme-panel h3 { color: var(--accent); margin-bottom: 1rem; font-size: 1rem; }
+.theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.theme-option { padding: 0.75rem 0.5rem; border-radius: var(--radius-sm); border: 2px solid var(--glass-border); background: var(--glass-bg); cursor: pointer; text-align: center; transition: var(--transition); font-size: 0.75rem; color: var(--text-1); font-weight: 500; }
+.theme-option:hover { border-color: var(--accent); transform: scale(1.05); }
+.theme-option.active { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+.theme-option .theme-dot { width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 0.4rem; }
+
+.progress-bar-container { width: 100%; height: 6px; background: var(--glass-bg); border-radius: 3px; margin: 1rem 0; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 3px; transition: width 0.5s ease; box-shadow: 0 0 10px var(--accent-glow); }
+
+.tooltip-bar { position: absolute; background: rgba(15, 23, 42, 0.95); color: #fff; padding: 0.6rem; border-radius: 12px; display: none; gap: 0.4rem; z-index: 9999; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+.tooltip-bar button { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.2); cursor: pointer; transition: transform 0.2s; }
+.tooltip-bar button:hover { transform: scale(1.15); }
+
+.modal-overlay { position: fixed; inset: 0; z-index: 3000; background: rgba(0, 0, 0, 0.6); display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 1rem; }
+.modal-overlay.active { display: flex; }
+.modal-content { width: 100%; max-width: 520px; padding: 2rem; animation: scaleIn 0.3s ease; }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.modal-content h3 { margin-bottom: 1.25rem; color: var(--accent); font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; }
+.modal-content textarea { width: 100%; min-height: 160px; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(10, 20, 40, 0.6); color: var(--text-1); font-family: inherit; font-size: 0.95rem; resize: vertical; outline: none; transition: var(--transition); line-height: 1.7; }
+.modal-content textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; }
+
+.btn-primary { padding: 0.7rem 1.75rem; border-radius: var(--radius-sm); border: none; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; cursor: pointer; font-weight: 600; font-family: inherit; transition: var(--transition); box-shadow: 0 4px 15px rgba(0, 212, 255, 0.25); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 212, 255, 0.35); }
+.btn-secondary { padding: 0.7rem 1.75rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(10, 20, 40, 0.5); color: var(--text-1); cursor: pointer; font-family: inherit; font-weight: 500; transition: var(--transition); }
+.btn-secondary:hover { background: rgba(0, 212, 255, 0.1); border-color: var(--accent); color: var(--accent); }
+
+.pomodoro-widget { position: fixed; top: 96px; right: 20px; width: 220px; z-index: 950; padding: 1.25rem; text-align: center; transition: var(--transition); }
+.pomodoro-widget.collapsed { width: auto; padding: 0.6rem 1rem; }
+.pomodoro-widget.collapsed .pomo-body { display: none; }
+.pomo-toggle { background: none; border: none; color: var(--accent); cursor: pointer; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; width: 100%; justify-content: center; }
+.pomo-time { font-size: 2.8rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); margin: 0.5rem 0; line-height: 1; }
+.pomo-label { font-size: 0.75rem; color: var(--text-2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+.pomo-controls { display: flex; justify-content: center; gap: 0.5rem; }
+.pomo-controls button { padding: 0.5rem 1rem; border-radius: 50px; border: 1px solid var(--glass-border); background: rgba(10, 20, 40, 0.5); color: var(--text-1); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: var(--transition); font-family: inherit; }
+.pomo-controls button:hover { border-color: var(--accent); color: var(--accent); }
+.pomo-controls button.active { background: linear-gradient(135deg, var(--accent-glow), rgba(124, 58, 237, 0.15)); border-color: var(--accent); color: var(--accent); }
+.pomo-progress-ring { width: 100px; height: 100px; margin: 0 auto 1rem; position: relative; }
+.pomo-progress-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.pomo-progress-ring .track { fill: none; stroke: rgba(100, 200, 255, 0.1); stroke-width: 4; }
+.pomo-progress-ring .progress { fill: none; stroke: url(#gradient); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1s linear; filter: drop-shadow(0 0 6px var(--accent-glow)); }
+
+.music-player { position: fixed; bottom: 20px; right: 20px; width: 360px; z-index: 2000; padding: 1.25rem; transition: var(--transition); }
+.music-player.collapsed { width: auto; padding: 0.75rem 1rem; }
+.music-player.collapsed .player-body { display: none; }
+.player-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.player-header span { font-weight: 700; font-size: 0.9rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem; }
+.player-visualizer { display: flex; align-items: flex-end; justify-content: center; gap: 3px; height: 32px; margin-bottom: 0.75rem; }
+.player-visualizer span { width: 4px; background: linear-gradient(to top, var(--accent), var(--accent-2)); border-radius: 2px; transition: height 0.1s ease; min-height: 4px; }
+.player-visualizer.paused span { height: 4px !important; }
+.player-track { font-size: 0.8rem; color: var(--text-2); text-align: center; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-progress { width: 100%; height: 4px; background: rgba(100, 200, 255, 0.1); border-radius: 2px; cursor: pointer; margin-bottom: 0.75rem; position: relative; }
+.player-progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 2px; width: 0%; transition: width 0.1s linear; position: relative; }
+.player-progress-bar::after { content: ''; position: absolute; right: -4px; top: -3px; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent-glow); opacity: 0; transition: opacity 0.2s; }
+.player-progress:hover .player-progress-bar::after { opacity: 1; }
+.player-controls { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.player-controls button { background: none; border: none; color: var(--text-1); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 1.2rem; }
+.player-controls button:hover { color: var(--accent); transform: scale(1.1); }
+.player-controls .play-btn { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); font-size: 1rem; }
+.player-controls .play-btn:hover { transform: scale(1.15); box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4); }
+.player-upload { display: flex; gap: 0.5rem; align-items: center; }
+.player-upload label { flex: 1; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border: 1px dashed var(--glass-border); background: rgba(10, 20, 40, 0.4); color: var(--text-2); font-size: 0.8rem; cursor: pointer; text-align: center; transition: var(--transition); }
+.player-upload label:hover { border-color: var(--accent); color: var(--accent); background: rgba(0, 212, 255, 0.05); }
+.player-upload input { display: none; }
+.player-playlist { max-height: 100px; overflow-y: auto; margin-top: 0.5rem; }
+.player-playlist-item { padding: 0.4rem 0.6rem; border-radius: 8px; font-size: 0.8rem; color: var(--text-2); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: var(--transition); }
+.player-playlist-item:hover, .player-playlist-item.active { background: rgba(0, 212, 255, 0.08); color: var(--accent); }
+.player-playlist-item.active::before { content: '▶ '; }
+
+.bookmark-bar { position: fixed; bottom: 90px; right: 20px; z-index: 950; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; }
+.bookmark-fab { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--glass-border); background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); transition: var(--transition); }
+.bookmark-fab:hover { transform: scale(1.1) rotate(15deg); }
+.bookmark-panel { width: 300px; max-height: 400px; overflow-y: auto; padding: 1rem; display: none; margin-bottom: 0.5rem; border-radius: var(--radius); background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); }
+.bookmark-panel.active { display: block; animation: fadeIn 0.3s ease; }
+.bookmark-item { padding: 0.75rem; border-radius: var(--radius-sm); background: rgba(10, 20, 40, 0.6); border: 1px solid var(--glass-border); margin-bottom: 0.5rem; cursor: pointer; transition: var(--transition); font-size: 0.85rem; }
+.bookmark-item:hover { border-color: var(--accent); background: rgba(0, 212, 255, 0.08); }
+.bookmark-item .bm-title { font-weight: 600; color: var(--accent); margin-bottom: 0.25rem; }
+.bookmark-item .bm-meta { color: var(--text-2); font-size: 0.75rem; }
+
+.export-bar { position: fixed; bottom: 20px; left: 20px; z-index: 950; }
+.export-btn { padding: 0.7rem 1.25rem; border-radius: 50px; border: 1px solid var(--glass-border); background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(124,58,237,0.15)); color: var(--accent); cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: var(--transition); font-family: inherit; backdrop-filter: blur(10px); }
+.export-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2); }
+
+.wordguess-container { max-width: 600px; margin: 2rem auto; text-align: center; }
+.wordguess-hint { font-size: 1.1rem; color: var(--text-2); margin-bottom: 1.5rem; line-height: 1.7; }
+.wordguess-hint strong { color: var(--accent); }
+.wordguess-word { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.wordguess-letter { width: 48px; height: 56px; border-radius: var(--radius-sm); border: 2px solid var(--glass-border); background: rgba(10, 20, 40, 0.5); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--text-1); text-transform: uppercase; transition: var(--transition); backdrop-filter: blur(10px); }
+.wordguess-letter.revealed { border-color: var(--success); background: rgba(16, 185, 129, 0.1); color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+.wordguess-keyboard { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.4rem; max-width: 520px; margin: 0 auto; }
+.wordguess-key { padding: 0.6rem 0.3rem; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(10, 20, 40, 0.5); color: var(--text-1); cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: var(--transition); font-family: inherit; }
+.wordguess-key:hover { background: rgba(0, 212, 255, 0.1); border-color: var(--accent); transform: translateY(-2px); }
+.wordguess-key.used { opacity: 0.3; pointer-events: none; transform: none; }
+.wordguess-key.correct { background: rgba(16, 185, 129, 0.2); border-color: var(--success); color: var(--success); }
+.wordguess-key.wrong { background: rgba(244, 63, 94, 0.15); border-color: var(--danger); color: var(--danger); }
+.wordguess-status { margin-top: 1.5rem; font-size: 1rem; min-height: 2rem; }
+.wordguess-status.win { color: var(--success); }
+.wordguess-status.lose { color: var(--danger); }
+.wordguess-hangman { font-size: 2.5rem; margin-bottom: 1rem; letter-spacing: 2px; }
+
+.sound-controls { display: flex; justify-content: center; gap: 1.5rem; margin-top: 2rem; flex-wrap: wrap; }
+.sound-card { padding: 1.5rem; width: 200px; text-align: center; cursor: pointer; transition: var(--transition); border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: var(--glass-bg); }
+.sound-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+.sound-card .sound-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.sound-card .sound-name { font-weight: 600; color: var(--text-1); margin-bottom: 0.5rem; }
+.sound-card .sound-status { font-size: 0.8rem; color: var(--text-2); }
+.sound-card.playing { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+.volume-slider { width: 100%; margin-top: 1rem; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: var(--glass-border); outline: none; }
+.volume-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 10px var(--accent-glow); }
+
+.badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; margin-left: 0.5rem; box-shadow: 0 4px 12px var(--accent-glow); }
+
+.highlight-yellow { background: rgba(250, 204, 21, 0.25); padding: 0 3px; border-radius: 3px; }
+.highlight-green { background: rgba(16, 185, 129, 0.25); padding: 0 3px; border-radius: 3px; }
+.highlight-blue { background: rgba(59, 130, 246, 0.25); padding: 0 3px; border-radius: 3px; }
+.highlight-pink { background: rgba(236, 72, 153, 0.25); padding: 0 3px; border-radius: 3px; }
+
+::selection { background: var(--accent-glow); color: #fff; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+@media (max-width: 768px) {
+  .sidebar { width: 260px; transform: translateX(-300px); }
+  .sidebar.show { transform: translateX(0); }
+  .main-content { margin-left: 0; padding: 90px 1rem 1rem; }
+  .dashboard-hero h1 { font-size: 1.8rem; }
+  .meditation-timer { font-size: 3rem; }
+  .flash-container { height: 350px; }
+  .search-box { max-width: 200px; }
+  .topbar { left: 8px; right: 8px; height: 56px; }
+  .music-player { width: 100% !important; right: 0 !important; left: 0 !important; border-radius: 0 !important; bottom: 0 !important; }
+  .pomodoro-widget { right: 10px !important; top: 80px !important; width: 180px !important; }
+  .bookmark-bar { bottom: 80px; right: 10px; }
+  .export-bar { bottom: 80px; left: 10px; }
+}
+
+@media (max-width: 480px) {
+  .dashboard-hero { padding: 1.5rem; }
+  .dashboard-hero h1 { font-size: 1.5rem; }
+  .stat-num { font-size: 2rem; }
+  .meditation-visual { width: 180px; height: 180px; }
+  .meditation-visual .inner-circle { width: 90px; height: 90px; font-size: 2rem; }
+  .theme-panel { width: 260px; right: 8px; }
+  .wordguess-keyboard { grid-template-columns: repeat(7, 1fr); }
+  .wordguess-letter { width: 36px; height: 44px; font-size: 1.2rem; }
+}
+</style>
+</head>
+<body data-theme="ocean">
+
+<<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<<canvas id="aquarium-canvas"></canvas>
+
+<div class="tooltip-bar" id="tooltipBar">
+  <button style="background:#facc15" onclick="highlightSelection('yellow')"></button>
+  <button style="background:#10b981" onclick="highlightSelection('green')"></button>
+  <button style="background:#3b82f6" onclick="highlightSelection('blue')"></button>
+  <button style="background:#ec4899" onclick="highlightSelection('pink')"></button>
+  <button onclick="removeHighlight()" style="background:var(--danger);color:#fff;font-size:11px;font-weight:700;">✕</button>
+</div>
+
+<div class="modal-overlay" id="noteModal" onclick="if(event.target===this)closeNote()">
+  <div class="modal-content glass-strong">
+    <h3>📝 Catatan Pribadi</h3>
+    <textarea id="noteText" placeholder="Tulis catatanmu di sini..."></textarea>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeNote()">Tutup</button>
+      <button class="btn-primary" onclick="saveNote()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="pomodoro-widget glass" id="pomodoroWidget">
+  <button class="pomo-toggle" onclick="togglePomodoro()">
+    <span>⏱️</span> <span id="pomoToggleText">Focus Timer</span>
+  </button>
+  <div class="pomo-body">
+    <div class="pomo-progress-ring">
+      <svg viewBox="0 0 100 100">
+        <circle class="track" cx="50" cy="50" r="45"/>
+        <circle class="progress" id="pomoProgress" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="0"/>
+      </svg>
+    </div>
+    <div class="pomo-time" id="pomoTime">25:00</div>
+    <div class="pomo-label" id="pomoLabel">Siap Fokus</div>
+    <div class="pomo-controls">
+      <button onclick="startPomodoro()">▶ Mulai</button>
+      <button onclick="pausePomodoro()">⏸ Pause</button>
+      <button onclick="resetPomodoro()">↺ Reset</button>
+    </div>
+    <div class="pomo-controls" style="margin-top:0.5rem;">
+      <button onclick="setPomoMode('focus', this)" class="active">Focus</button>
+      <button onclick="setPomoMode('short', this)">Short</button>
+      <button onclick="setPomoMode('long', this)">Long</button>
+    </div>
+  </div>
+</div>
+
+<div class="music-player glass" id="musicPlayer">
+  <div class="player-header">
+    <span>🎵 DermaBeats</span>
+    <button class="icon-btn" onclick="toggleMusicPlayer()" style="width:28px;height:28px;">
+      <span style="font-size:0.8rem;">✕</span>
+    </button>
+  </div>
+  <div class="player-body">
+    <div class="player-visualizer paused" id="playerVisualizer">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="player-track" id="playerTrack">Belum ada lagu</div>
+    <div class="player-progress" id="playerProgressBar" onclick="seekMusic(event)">
+      <div class="player-progress-bar" id="playerProgress"></div>
+    </div>
+    <div class="player-controls">
+      <button onclick="prevTrack()">⏮</button>
+      <button class="play-btn" onclick="togglePlay()" id="playBtn">▶</button>
+      <button onclick="nextTrack()">⏭</button>
+    </div>
+    <div class="player-upload">
+      <label for="musicUpload">📁 Upload Lagu</label>
+      <input type="file" id="musicUpload" accept="audio/*" multiple onchange="loadMusic(event)">
+    </div>
+    <div class="player-playlist" id="playerPlaylist"></div>
+  </div>
+</div>
+
+<div class="bookmark-bar">
+  <div class="bookmark-panel glass" id="bookmarkPanel">
+    <h3 style="color:var(--accent);margin-bottom:0.75rem;font-size:1rem;">🔖 Bookmark</h3>
+    <div id="bookmarkList"></div>
+  </div>
+  <button class="bookmark-fab" onclick="toggleBookmarkPanel()" title="Bookmark">🔖</button>
+  <button class="bookmark-fab" style="background:linear-gradient(135deg,var(--success),var(--accent));margin-top:0.5rem;" onclick="addBookmark()" title="Tambah Bookmark">➕</button>
+</div>
+
+<div class="export-bar">
+  <button class="export-btn" onclick="exportProgress()">📤 Export Progress</button>
+</div>
+
+<div class="topbar glass">
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <button class="icon-btn" onclick="toggleSidebar()" id="menuBtn" title="Menu"><span>☰</span></button>
+    <div class="brand" onclick="showView('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        <path d="M12 6v6l4 2" stroke-linecap="round"/>
+        <circle cx="12" cy="12" r="3" stroke-width="1.5"/>
+      </svg>
+      DermaLearn Pro
+    </div>
+  </div>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Cari materi, istilah medis..." id="searchInput" onkeydown="if(event.key==='Enter')performSearch()">
+  </div>
+  <div class="top-controls">
+    <button class="icon-btn" id="musicToggleBtn" onclick="toggleMusicPlayer()" title="Music Player">
+      <div class="music-bar paused" id="topMusicBars"><span></span><span></span><span></span><span></span></div>
+    </button>
+    <button class="icon-btn" id="themeBtn" onclick="toggleThemePanel()" title="Ganti Tema"><span>🎨</span></button>
+    <button class="icon-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Layar Penuh"><span>⛶</span></button>
+  </div>
+</div>
+
+<div class="theme-panel glass" id="themePanel">
+  <h3>Pilih Tema</h3>
+  <div class="theme-grid">
+    <div class="theme-option active" data-theme="ocean" onclick="setTheme('ocean')"><div class="theme-dot" style="background: linear-gradient(135deg, #00d4ff, #7c3aed);"></div><div>Ocean</div></div>
+    <div class="theme-option" data-theme="sunset" onclick="setTheme('sunset')"><div class="theme-dot" style="background: linear-gradient(135deg, #ff7e5f, #feb47b);"></div><div>Sunset</div></div>
+    <div class="theme-option" data-theme="forest" onclick="setTheme('forest')"><div class="theme-dot" style="background: linear-gradient(135deg, #4ade80, #22c55e);"></div><div>Forest</div></div>
+    <div class="theme-option" data-theme="lavender" onclick="setTheme('lavender')"><div class="theme-dot" style="background: linear-gradient(135deg, #c084fc, #a855f7);"></div><div>Lavender</div></div>
+    <div class="theme-option" data-theme="peach" onclick="setTheme('peach')"><div class="theme-dot" style="background: linear-gradient(135deg, #fb7185, #f43f5e);"></div><div>Peach</div></div>
+    <div class="theme-option" data-theme="golden" onclick="setTheme('golden')"><div class="theme-dot" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);"></div><div>Golden</div></div>
+  </div>
+  <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--glass-border);">
+    <h3>Zoom Tampilan</h3>
+    <input type="range" min="50" max="200" value="100" id="zoomSlider" oninput="setZoom(this.value)" style="width:100%; margin-top:0.5rem; accent-color: var(--accent);">
+    <div style="display:flex; justify-content:space-between; color:var(--text-2); font-size:0.75rem; margin-top:0.25rem;">
+      <span>50%</span><span id="zoomValue">100%</span><span>200%</span>
+    </div>
+  </div>
+</div>
+
+<div class="sidebar glass" id="sidebar">
+  <div class="nav-group">
+    <div class="nav-title">Menu Utama</div>
+    <div class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard"><span class="nav-icon">🏠</span><span class="nav-text">Dashboard</span></div>
+    <div class="nav-item" onclick="showView('motivation')" id="nav-motivation"><span class="nav-icon">💬</span><span class="nav-text">Kata Penyemangat</span></div>
+    <div class="nav-item" onclick="showView('meditation')" id="nav-meditation"><span class="nav-icon">🧘</span><span class="nav-text">Sesi Meditasi</span></div>
+    <div class="nav-item" onclick="showView('flashcards')" id="nav-flashcards"><span class="nav-icon">🎴</span><span class="nav-text">Flashcards</span></div>
+    <div class="nav-item" onclick="showView('wordguess')" id="nav-wordguess"><span class="nav-icon">⭐</span><span class="nav-text">Tebak Kata</span></div>
+    <div class="nav-item" onclick="showView('exam')" id="nav-exam"><span class="nav-icon">📝</span><span class="nav-text">Simulasi Ujian</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-title">Materi Kulit & Infeksi</div>
+    <div class="nav-item" onclick="showView('slide-01')" id="nav-slide-01"><span class="nav-icon">🦠</span><span class="nav-text">Kelainan Kulit Infeksi Parasit</span></div>
+    <div class="nav-item" onclick="showView('slide-02')" id="nav-slide-02"><span class="nav-icon">🎨</span><span class="nav-text">Kelainan Pigmentasi Kulit</span></div>
+    <div class="nav-item" onclick="showView('slide-03')" id="nav-slide-03"><span class="nav-icon">💊</span><span class="nav-text">Farmakologi Dermatologi</span></div>
+    <div class="nav-item" onclick="showView('slide-04')" id="nav-slide-04"><span class="nav-icon">🔥</span><span class="nav-text">Luka Bakar</span></div>
+    <div class="nav-item" onclick="showView('slide-05')" id="nav-slide-05"><span class="nav-icon">🐺</span><span class="nav-text">Lupus Erythematosus</span></div>
+    <div class="nav-item" onclick="showView('slide-06')" id="nav-slide-06"><span class="nav-icon">🔍</span><span class="nav-text">Memahami Benjolan Kulit</span></div>
+    <div class="nav-item" onclick="showView('slide-07')" id="nav-slide-07"><span class="nav-icon">🔬</span><span class="nav-text">Patologi Kulit</span></div>
+    <div class="nav-item" onclick="showView('slide-08')" id="nav-slide-08"><span class="nav-icon">🧪</span><span class="nav-text">Pembuatan Sediaan Topikal</span></div>
+    <div class="nav-item" onclick="showView('slide-09')" id="nav-slide-09"><span class="nav-icon">🐛</span><span class="nav-text">Infestasi Tungau & Parasit</span></div>
+    <div class="nav-item" onclick="showView('slide-10')" id="nav-slide-10"><span class="nav-icon">🔴</span><span class="nav-text">Skabies</span></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-title">Materi THT & Lainnya</div>
+    <div class="nav-item" onclick="showView('slide-11')" id="nav-slide-11"><span class="nav-icon">👂</span><span class="nav-text">Tumor Organ THT</span></div>
+    <div class="nav-item" onclick="showView('slide-12')" id="nav-slide-12"><span class="nav-icon">⚡</span><span class="nav-text">Hipersensitivitas</span></div>
+    <div class="nav-item" onclick="showView('slide-13')" id="nav-slide-13"><span class="nav-icon">🔷</span><span class="nav-text">Urticaria</span></div>
+    <div class="nav-item" onclick="showView('slide-14')" id="nav-slide-14"><span class="nav-icon">✂️</span><span class="nav-text">Vulnus Laseratum</span></div>
+  </div>
+  <div style="margin-top: 2rem; padding: 1rem; border-radius: var(--radius-sm); background: var(--accent-glow); text-align: center;">
+    <div style="font-size: 0.8rem; color: var(--text-2); margin-bottom: 0.5rem;">Progress Belajar</div>
+    <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent);" id="progressPercent">0%</div>
+    <div class="progress-bar-container" style="margin: 0.5rem 0;"><div class="progress-bar-fill" id="progressBar" style="width: 0%"></div></div>
+    <div style="font-size: 0.75rem; color: var(--text-2);" id="progressText">0 dari 14 materi</div>
+  </div>
+</div>
+
+<div class="main-content" id="mainContent">
+
+<div class="view active" id="dashboard">
+  <div class="dashboard-hero glass">
+    <h1>Selamat Datang di DermaLearn Pro 👋</h1>
+    <p>Pusat pembelajaran <strong>Dermatologi & Kedokteran</strong> yang adaptif dengan kebutuhanmu.</p>
+  </div>
+  <div class="challenge-card glass" id="dailyChallenge">
+    <div class="challenge-header">
+      <h3>🔥 Tantangan Harian</h3>
+      <span class="challenge-streak" id="streakBadge">🔥 Streak 0 hari</span>
+    </div>
+    <p style="color:var(--text-2);margin-bottom:1rem;">Selesaikan 3 aktivitas hari ini untuk mempertahankan streak!</p>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+      <div class="pill-btn" id="task1" onclick="completeTask(1)">📖 Baca Materi</div>
+      <div class="pill-btn" id="task2" onclick="completeTask(2)">🎴 5 Flashcard</div>
+      <div class="pill-btn" id="task3" onclick="completeTask(3)">⚡ 1 Kuis</div>
+    </div>
+  </div>
+  <div class="quick-stats">
+    <div class="quick-stat glass-card"><span>📚</span><div><span class="value" id="statProgress">0%</span> Progress</div></div>
+    <div class="quick-stat glass-card"><span>⚡</span><div><span class="value" id="statQuiz">0</span> Kuis</div></div>
+    <div class="quick-stat glass-card"><span>🎴</span><div><span class="value" id="statFlash">0</span> Flashcard</div></div>
+    <div class="quick-stat glass-card"><span>📝</span><div><span class="value" id="statNotes">0</span> Catatan</div></div>
+    <div class="quick-stat glass-card"><span>🎮</span><div><span class="value" id="statGames">0</span> Game</div></div>
+  </div>
+  <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
+    <h2 style="color: var(--accent); margin-bottom: 1rem; font-size: 1.3rem;">📋 Daftar Materi</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-01')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🦠</div><div style="font-weight: 600;">Kelainan Kulit Akibat Infeksi Parasit</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-02')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🎨</div><div style="font-weight: 600;">Kelainan Pigmentasi Kulit</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-03')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💊</div><div style="font-weight: 600;">Farmakologi Dermatologi & Kusta</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-04')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔥</div><div style="font-weight: 600;">Luka Bakar</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-05')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🐺</div><div style="font-weight: 600;">Lupus Erythematosus Spectrum</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-06')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔍</div><div style="font-weight: 600;">Memahami Benjolan Kulit</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-07')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔬</div><div style="font-weight: 600;">Patologi Kulit</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-08')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🧪</div><div style="font-weight: 600;">Pembuatan Sediaan Topikal</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-09')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🐛</div><div style="font-weight: 600;">Infestasi Tungau & Parasit</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-10')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔴</div><div style="font-weight: 600;">Skabies</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-11')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">👂</div><div style="font-weight: 600;">Tumor Organ THT</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-12')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚡</div><div style="font-weight: 600;">Hipersensitivitas</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-13')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔷</div><div style="font-weight: 600;">Urticaria</div></div>
+      <div class="glass-card" style="padding: 1.25rem; cursor: pointer;" onclick="showView('slide-14')"><div style="font-size: 1.5rem; margin-bottom: 0.5rem;">✂️</div><div style="font-weight: 600;">Vulnus Laseratum</div></div>
+    </div>
+  </div>
+  <div class="recommendation-card glass">
+    <h3>🎯 Rekomendasi Hari Ini</h3>
+    <ul>
+      <li>Pelajari materi <strong>Skabies</strong> — penyakit kulit tersering ke-3 di Indonesia.</li>
+      <li>Kerjakan <strong>10 Flashcard</strong> tentang terminologi dermatologi.</li>
+      <li>Ikuti <strong>Simulasi Ujian</strong> untuk persiapan ujian komprehensif.</li>
+      <li>Main <strong>Tebak Kata</strong> untuk istirahat otak yang produktif.</li>
+      <li>Aktifkan <strong>Pomodoro Timer</strong> agar belajar lebih fokus.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="view" id="motivation">
+  <div class="content-header"><h1>💬 Kata-Kata Penyemangat Harian</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Kata Penyemangat</span></div>
+  <div class="motivation-widget glass" id="motivationWidget">
+    <div class="quote-day" id="quoteDay">Hari 1</div>
+    <div class="quote-icon">❝</div>
+    <div class="quote-text" id="quoteText">"Kesuksesan bukanlah kunci kebahagiaan..."</div>
+    <div class="quote-author" id="quoteAuthor">- Albert Schweitzer</div>
+  </div>
+  <div style="display: flex; justify-content: center; gap: 1rem; margin: 1.5rem 0;">
+    <button class="pill-btn primary" onclick="prevQuote()">◀ Sebelumnya</button>
+    <button class="pill-btn primary" onclick="randomQuote()">🎲 Acak</button>
+    <button class="pill-btn primary" onclick="nextQuote()">Selanjutnya ▶</button>
+  </div>
+  <div class="glass" style="padding: 1.5rem; margin-top: 2rem;">
+    <h3 style="color: var(--accent); margin-bottom: 1rem;">📅 Pilih Hari</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;" id="quoteDays"></div>
+  </div>
+</div>
+
+<div class="view" id="meditation">
+  <div class="content-header"><h1>🧘 Sesi Meditasi</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Sesi Meditasi</span></div>
+  <div class="meditation-container glass">
+    <div class="meditation-visual"><div class="inner-circle">🧘</div></div>
+    <div class="meditation-timer" id="meditationTimer">05:00</div>
+    <div class="meditation-status" id="meditationStatus">Siap memulai meditasi</div>
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0;">
+      <button class="pill-btn primary" id="medStartBtn" onclick="startMeditation()">▶ Mulai</button>
+      <button class="pill-btn" id="medPauseBtn" onclick="pauseMeditation()" style="display:none;">⏸ Pause</button>
+      <button class="pill-btn" onclick="resetMeditation()">↺ Reset</button>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+      <button class="pill-btn" onclick="setMeditationTime(3)">3 menit</button>
+      <button class="pill-btn" onclick="setMeditationTime(5)">5 menit</button>
+      <button class="pill-btn" onclick="setMeditationTime(10)">10 menit</button>
+      <button class="pill-btn" onclick="setMeditationTime(15)">15 menit</button>
+      <button class="pill-btn" onclick="setMeditationTime(20)">20 menit</button>
+    </div>
+    <div style="border-top: 1px solid var(--glass-border); padding-top: 1.5rem; margin-top: 1rem;">
+      <h3 style="color: var(--accent); margin-bottom: 1rem;">🎵 Suara Latar</h3>
+      <div class="sound-controls">
+        <div class="sound-card" id="rainCard" onclick="toggleSound('rain')">
+          <div class="sound-icon">🌧️</div><div class="sound-name">Hujan</div>
+          <div class="sound-status" id="rainStatus">Tap untuk memutar</div>
+          <input type="range" class="volume-slider" min="0" max="100" value="50" oninput="setVolume('rain', this.value)" onclick="event.stopPropagation()">
+        </div>
+        <div class="sound-card" id="waterCard" onclick="toggleSound('water')">
+          <div class="sound-icon">💧</div><div class="sound-name">Air Mengalir</div>
+          <div class="sound-status" id="waterStatus">Tap untuk memutar</div>
+          <input type="range" class="volume-slider" min="0" max="100" value="50" oninput="setVolume('water', this.value)" onclick="event.stopPropagation()">
+        </div>
+      </div>
+    </div>
+    <div class="info-card info" style="margin-top: 2rem;">
+      <div class="info-card-title">💡 Tips Meditasi</div>
+      <div class="info-card-body">
+        <ul style="margin-left: 1.2rem; margin-top: 0.5rem;">
+          <li>Temukan posisi duduk yang nyaman</li>
+          <li>Tutup mata perlahan dan fokus pada napas</li>
+          <li>Jika pikiran melayang, bawa kembali ke napas tanpa menghakimi</li>
+          <li>Suara hujan atau air dapat membantu menenangkan pikiran</li>
+          <li>Konsistensi lebih penting dari durasi</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="flashcards">
+  <div class="content-header"><h1>🎴 Flashcards Belajar</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Flashcards</span></div>
+  <div style="text-align: center; margin-bottom: 1.5rem;"><p style="color: var(--text-2); font-size: 0.9rem;">Klik kartu untuk membaliknya.</p></div>
+  <div class="flash-container">
+    <div class="flash-card" id="flashCard" onclick="flipCard()">
+      <div class="flash-front"><div style="font-size: 0.8rem; color: var(--text-2); margin-bottom: 1rem;">ISTILAH MEDIS</div><div id="flashFrontText">Loading...</div></div>
+      <div class="flash-back"><div style="font-size: 0.8rem; color: var(--accent); margin-bottom: 1rem;">DEFINISI</div><div id="flashBackText">Loading...</div></div>
+    </div>
+  </div>
+  <div class="flash-controls">
+    <button class="pill-btn primary" onclick="prevCard()">◀ Sebelumnya</button>
+    <button class="pill-btn" onclick="shuffleCards()">🔀 Acak</button>
+    <button class="pill-btn primary" onclick="nextCard()">Selanjutnya ▶</button>
+  </div>
+  <div class="flash-progress" id="flashProgress">1 dari 20 kartu</div>
+</div>
+
+<div class="view" id="wordguess">
+  <div class="content-header"><h1>⭐ Tebak Kata Medis</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Tebak Kata</span></div>
+  <div class="wordguess-container">
+    <div class="wordguess-hangman" id="hangmanDisplay">☠️ ❤️❤️❤️❤️❤️</div>
+    <div class="wordguess-hint" id="wordguessHint"><strong>Petunjuk:</strong> <span id="wordguessHintText">Loading...</span></div>
+    <div class="wordguess-word" id="wordguessWord"></div>
+    <div class="wordguess-keyboard" id="wordguessKeyboard"></div>
+    <div class="wordguess-status" id="wordguessStatus"></div>
+    <div style="margin-top: 1.5rem;"><button class="pill-btn primary" onclick="initWordGuess()">🔄 Kata Baru</button></div>
+  </div>
+  <div class="glass" style="padding: 1.5rem; margin-top: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+    <h3 style="color: var(--accent); margin-bottom: 0.5rem;">🎮 Cara Bermain</h3>
+    <p style="color: var(--text-2); font-size: 0.9rem; line-height: 1.8;">Tebak kata medis berdasarkan petunjuk. Kamu punya <strong>5 nyawa</strong>. Setiap tebakan salah mengurangi nyawa.</p>
+  </div>
+</div>
+
+<div class="view" id="slide-01">
+  <div class="content-header"><h1>🦠 Kelainan Kulit Akibat Infeksi Parasit</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Kelainan Kulit Infeksi Parasit</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👨‍⚕️ Pengajar</div><div class="info-card-body">dr. Hanina, M.Biomed</div></div>
+    <h2>📌 Parasit Penyebab Penyakit Kulit</h2>
+    <p>Parasit yang menyebabkan kelainan kulit dibagi menjadi beberapa kelompok:</p>
+    <ul>
+      <li><b>Acarina</b> → <span class="medical-term">Sarcoptes scabiei</span> (tungau kudis), <span class="medical-term">Demodex sp.</span> (tungau wajah)</li>
+      <li><b>Serangga</b> → kelainan karena <b>toksin</b> yang dikeluarkan dan <b>alergen</b> pada orang yang rentan</li>
+      <li><b>Jamur</b> → mikosis superficial dan profunda</li>
+      <li><b>Helmint</b> → <span class="medical-term">Cutaneous larva migrans</span> (penyakit larva berjalan di kulit), creeping eruption</li>
+    </ul>
+    <h2>🔴 SKABIES (KUDIS)</h2>
+    <div class="info-card danger">
+      <div class="info-card-title">Definisi</div>
+      <div class="info-card-body">Penyakit kulit menular yang disebabkan oleh <i>Sarcoptes scabiei</i> (tungau kudis). Lebih sering menyerang bayi dan anak. Disebut juga <b>scabies</b>.</div>
+    </div>
+    <h3>Gejala Klinis:</h3>
+    <ul>
+      <li><b>Gatal hebat</b> terutama di malam hari (<span class="medical-term">pruritus nokturna</span>)</li>
+      <li>Predileksi: sela jari, pergelangan tangan, siku, punggung, skrotum, kaki</li>
+      <li>Lesi: <span class="medical-term">papul</span> (benjolan kecil), <span class="medical-term">vesikel</span> (gelembung kecil), <span class="medical-term">urtika</span> (biduran)</li>
+      <li><b>Kunikulus</b> (terowongan tungau) kurang lebih 1 cm di kulit</li>
+    </ul>
+    <h3>Diagnosis:</h3>
+    <p>Diagnosis klinis minimal <b>2 gejala</b> berikut:</p>
+    <ul>
+      <li>Pruritus nokturna (gatal malam hari)</li>
+      <li>Menyerang manusia secara kelompok</li>
+      <li>Kunikulus kurang lebih 1 cm</li>
+      <li>Menemukan tungau dari kerokan kulit</li>
+    </ul>
+    <h3>Tatalaksana:</h3>
+    <div class="info-card success">
+      <div class="info-card-title">Terapi</div>
+      <div class="info-card-body">
+        <ul>
+          <li><b>Edukasi</b>: higiene, pengobatan kelompok</li>
+          <li><b>Obat topikal:</b> Sulfur presipitatum 4-20%, Emulsi benzil benzoat, Permetrin 5% (pilihan utama), Krotamiton 10%</li>
+        </ul>
+      </div>
+    </div>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-01')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-01')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-01')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-01"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-02">
+  <div class="content-header"><h1>🎨 Gangguan Pigmentasi Kulit</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Kelainan Pigmentasi Kulit</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👩‍⚕️ Pengajar</div><div class="info-card-body">Dr. Dewi Lastya Sari, M.Ked(DV), Sp.DV</div></div>
+    <h2>🌈 Warna Kulit</h2>
+    <p>Warna kulit ditentukan oleh empat <b>biokrom</b> (pigmen alami):</p>
+    <ul>
+      <li><span class="medical-term">Melanin</span> → warna coklat (penentu utama warna kulit)</li>
+      <li><span class="medical-term">Hemoglobin tereduksi</span> → warna biru</li>
+      <li><span class="medical-term">Hemoglobin teroksidasi</span> → warna merah</li>
+      <li><span class="medical-term">Karotenoid</span> → warna kuning</li>
+    </ul>
+    <h2>⚪ Vitiligo</h2>
+    <div class="info-card">
+      <div class="info-card-title">Definisi</div>
+      <div class="info-card-body">Vitiligo merupakan penyakit <b>depigmentasi</b> (kehilangan warna) didapat pada kulit, membran mukosa, dan rambut dengan karakteristik khas berupa <b>makula putih susu</b> (depigmentasi) berbatas tegas dan bertambah besar secara progresif akibat hilangnya melanosit fungsional.</div>
+    </div>
+    <h3>Empat Hipotesis Patofisiologi:</h3>
+    <ol>
+      <li><b>Hipotesis Autoimun/Sitotoksik</b>: Perubahan imunitas humoral dan seluler (sel T CD8+) → menarget melanosit</li>
+      <li><b>Hipotesis Oksidan-Antioksidan</b>: Produk perantara/metabolisme sintesis melanin → kerusakan melanosit</li>
+      <li><b>Hipotesis Neural</b>: Mediator neurokimia → menghancurkan melanosit</li>
+      <li><b>Defek Intrinsik</b>: Kelainan inheren → menghambat pertumbuhan dan diferensiasi melanosit</li>
+    </ol>
+    <h3>Tatalaksana Vitiligo:</h3>
+    <table class="data-table">
+      <tr><th>Terapi</th><th>Deskripsi</th></tr>
+      <tr><td><b>PUVA</b></td><td>Obat fotodinamik yang menyerap energi radiasi. Efektif untuk vitiligo generalisata.</td></tr>
+      <tr><td><b>Narrowband UVB</b></td><td>Berdasarkan sifat imunomodulator. Repigmentasi perifolikuler.</td></tr>
+      <tr><td><b>Kortikosteroid topikal</b></td><td>Untuk localized vitiligo, sangat direkomendasikan untuk wajah.</td></tr>
+      <tr><td><b>Takrolimus</b></td><td>Macrolide immunosuppressant, obat relatif baru untuk vitiligo</td></tr>
+      <tr><td><b>Laser Excimer</b></td><td>Xenon-Klor (Xe-Cl), panjang gelombang 308nm, inovatif untuk vitiligo</td></tr>
+    </table>
+    <h2>🟤 Melasma</h2>
+    <div class="info-card warning">
+      <div class="info-card-title">Definisi</div>
+      <div class="info-card-body">Hipermelanosis (peningkatan pigmen) yang menyebabkan bercak-bercak coklat pada wajah. Dikenal juga sebagai <b>kloasma</b> atau <b>mask of pregnancy</b>.</div>
+    </div>
+    <h3>Penatalaksanaan:</h3>
+    <table class="data-table">
+      <tr><th>Kategori</th><th>Terapi</th></tr>
+      <tr><td><b>Pencegahan</b></td><td>Hindari sinar UV langsung pukul 09.00-15.00, Tabir surya, Topi lebar/payung</td></tr>
+      <tr><td><b>Topikal</b></td><td>Hidrokinon 2-5%, Asam retinoat 0,1%, Asam azelaat 20%</td></tr>
+      <tr><td><b>Tindakan Khusus</b></td><td>Pengelupasan kimiawi, Laser Q Switch Ruby / Argon</td></tr>
+    </table>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-02')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-02')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-02')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-02"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-03">
+  <div class="content-header"><h1>💊 Farmakologi: Dermatologi & Kusta</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Farmakologi Dermatologi</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👨‍⚕️ Pengajar</div><div class="info-card-body">dr. Ave Olivia Rahman, MSc. - Bagian Farmakologi FKIK UNJA</div></div>
+    <h2>📌 Tujuan Pembelajaran</h2>
+    <ul>
+      <li>Mampu menjelaskan farmakokinetik rute obat transdermal</li>
+      <li>Mampu menjelaskan obat untuk penyakit kulit</li>
+      <li>Mampu menuliskan resep obat transdermal</li>
+    </ul>
+    <h2>🔄 Rute Pemberian Transdermal</h2>
+    <div class="info-card info">
+      <div class="info-card-title">Absorpsi Obat Transdermal</div>
+      <div class="info-card-body">
+        <p><b>Rute penyerapan:</b></p>
+        <ul>
+          <li>Di antara sel-sel stratum korneum (<span class="medical-term">interseluler</span>)</li>
+          <li>Melintasi lapisan sel kornea (<span class="medical-term">transseluler</span>)</li>
+          <li>Ke dalam cekungan folikel rambut (<span class="medical-term">folikular</span>)</li>
+        </ul>
+      </div>
+    </div>
+    <h2>💉 Glukokortikoid Topikal</h2>
+    <div class="info-card warning">
+      <div class="info-card-title">Potensi dan Penggunaan</div>
+      <div class="info-card-body">
+        <ul>
+          <li>Steroid dipilih berdasarkan <b>potensi</b>, lokasi, dan tingkat keparahan</li>
+          <li>Aplikasi <b>2x sehari</b> biasanya cukup</li>
+          <li><b>Efek samping kronis</b>: atrofi kulit, striae, telangiektasia, purpura, erupsi acneiform</li>
+        </ul>
+      </div>
+    </div>
+    <h2>🏥 FARMAKOLOGI: KUSTA</h2>
+    <h3>Obat Terapi Kusta (MDT):</h3>
+    <table class="data-table">
+      <tr><th>Obat</th><th>Mekanisme</th><th>Dosis Dewasa</th></tr>
+      <tr><td><b>Rifampicin</b></td><td>Hambat RNA polymerase bakteri</td><td>600 mg 1×/bulan (supervised)</td></tr>
+      <tr><td><b>Dapsone</b></td><td>Hambat sintesis asam folat bakteri</td><td>100 mg/hari</td></tr>
+      <tr><td><b>Clofazimine</b></td><td>Ikat DNA bakteri, radikal bebas</td><td>300 mg 1×/bulan + 50 mg/hari</td></tr>
+    </table>
+    <h3>Regimen MDT Dewasa:</h3>
+    <table class="data-table">
+      <tr><th>Komponen</th><th>Pausibasiler (PB)</th><th>Multibasiler (MB)</th></tr>
+      <tr><td><b>Supervised</b> (1×/bulan)</td><td>Rifampicin 600 mg</td><td>Rifampicin 600 mg + Clofazimine 300 mg</td></tr>
+      <tr><td><b>Harian</b></td><td>Dapsone 100 mg</td><td>Dapsone 100 mg + Clofazimine 50 mg</td></tr>
+      <tr><td><b>Durasi</b></td><td>6 bulan</td><td>12 bulan</td></tr>
+    </table>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-03')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-03')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-03')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-03"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-04">
+  <div class="content-header"><h1>🔥 Luka Bakar</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Luka Bakar</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👩‍⚕️ Pengajar</div><div class="info-card-body">Dr. Rini Chrisna, M.Ked(DV), SpDV</div></div>
+    <h2>📌 Definisi</h2>
+    <div class="info-card danger">
+      <div class="info-card-body">Luka bakar adalah <b>kerusakan atau kehilangan kulit, mukosa, dan jaringan yang lebih dalam</b> akibat:
+        <ul>
+          <li><b>Thermal</b> (panas/api)</li>
+          <li><b>Kimia</b> (zat kimia korosif)</li>
+          <li><b>Listrik</b> (sengatan listrik)</li>
+          <li><b>Radiasi</b> (sinar UV, radiasi)</li>
+        </ul>
+      </div>
+    </div>
+    <h2>🔬 Gambaran Klinis Luka Bakar</h2>
+    <h3>Klasifikasi Berdasarkan Kedalaman:</h3>
+    <table class="data-table">
+      <tr><th>Derajat</th><th>Nama</th><th>Ciri Khas</th><th>Penyembuhan</th></tr>
+      <tr><td><b>Derajat I</b></td><td>Superfisial</td><td>Eritema (merah), nyeri, tidak ada lepuh. Menyebabkan hiperpigmentasi.</td><td>3-6 hari</td></tr>
+      <tr><td><b>Derajat IIa</b></td><td>Superficial Partial</td><td>Lepuh jernih, dasar merah muda, nyeri, sensasi rambut ada.</td><td>1-2 minggu, tanpa scar</td></tr>
+      <tr><td><b>Derajat IIb</b></td><td>Deep Partial</td><td>Lepuh pecah, dasar pucat/putih, sensasi berkurang.</td><td>2-3 minggu, bisa scar</td></tr>
+      <tr><td><b>Derajat III</b></td><td>Full Thickness</td><td>Kering, pucat/putih/hitam, tidak nyeri (destruksi nervus), eschar (keropeng keras).</td><td>Tidak spontan, perlu grafting</td></tr>
+    </table>
+    <h2>💧 Resusitasi Cairan</h2>
+    <div class="info-card warning">
+      <div class="info-card-title">Indikasi dan Pilihan Cairan</div>
+      <div class="info-card-body">
+        <ul>
+          <li>Luas luka bakar <b>&gt;20%</b> → perlu resusitasi cairan IV</li>
+          <li><b>Pilihan cairan</b>: Ringer Laktat dan Dekstrosa 5%</li>
+        </ul>
+      </div>
+    </div>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-04')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-04')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-04')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-04"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-05">
+  <div class="content-header"><h1>🐺 Lupus Erythematosus Spectrum</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Lupus Erythematosus</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">📚 Materi Visual Lengkap</div><div class="info-card-body">Materi ini mencakup spektrum penyakit Lupus Erythematosus dari bentuk kutan hingga sistemik.</div></div>
+    <h2>🔬 Spektrum Lupus</h2>
+    <table class="data-table">
+      <tr><th>Tipe</th><th>Karakteristik Kulit</th><th>Manifestasi Sistemik</th></tr>
+      <tr><td><b>ACLE</b></td><td>Rash malar (kupu-kupu), fotosensitivitas</td><td>Biasanya dengan SLE</td></tr>
+      <tr><td><b>SCLE</b></td><td>Papuloskuamous atau annular, non-scarring</td><td>Ringan, mungkin artralgia</td></tr>
+      <tr><td><b>CCLE/DLE</b></td><td>Diskoid: plak, atrofi, hiperpigmentasi</td><td>5-10% berkembang ke SLE</td></tr>
+      <tr><td><b>SLE</b></td><td>Berbagai lesi kulit</td><td>Ginjal, neurologis, hematologi</td></tr>
+    </table>
+    <h3>ACLE - Acute Cutaneous Lupus:</h3>
+    <ul>
+      <li><b>Rash malar</b>: bentuk seperti sayap kupu-kupu di pipi dan hidung</li>
+      <li><b>Rash fotoakut</b>: muncul setelah paparan matahari</li>
+    </ul>
+    <h3>DLE - Diskoid Lupus Erythematosus:</h3>
+    <ul>
+      <li><b>Plak eritematosa</b> dengan sisik, folikelular plugging</li>
+      <li>Atrofi, skarring, hiperpigmentasi, <span class="medical-term">alopecia sikatrik</span></li>
+      <li><b>5-10% berkembang ke SLE</b></li>
+    </ul>
+    <h2>💊 Terapi</h2>
+    <table class="data-table">
+      <tr><th>Kondisi</th><th>Terapi</th></tr>
+      <tr><td>CLE ringan</td><td>Tabir surya, kortikosteroid topikal, kalsineurin inhibitor</td></tr>
+      <tr><td>CLE moderate</td><td>Antimalaria (hidroksiklorokuin), kortikosteroid sistemik ringan</td></tr>
+      <tr><td>SLE berat</td><td>Kortikosteroid tinggi dosis + siklofosfamid/rituksimab</td></tr>
+    </table>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-05')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-05')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-05')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-05"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-06">
+  <div class="content-header"><h1>🔍 Memahami Benjolan Kulit</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Memahami Benjolan Kulit</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">📚 Materi Visual Lengkap</div><div class="info-card-body">Panduan komprehensif untuk memahami berbagai jenis benjolan dan massa pada kulit.</div></div>
+    <h2>⚠️ Tanda-Tanda Kecurigaan Ganas</h2>
+    <div class="info-card danger">
+      <div class="info-card-title">RED FLAGS - Segera Rujuk!</div>
+      <div class="info-card-body">
+        <ul>
+          <li><b>Pertumbuhan cepat</b> dalam hitungan minggu/bulan</li>
+          <li><b>Variasi warna</b> dalam satu lesi (hitam, coklat, merah, putih, biru)</li>
+          <li><b>Ulkusasi</b> (luka) yang tidak sembuh &gt;3 minggu</li>
+          <li><b>Pendarahan spontan</b></li>
+          <li><b>Batas tidak tegas</b>, asimetris</li>
+          <li><b>Diameter &gt;6mm</b></li>
+          <li><b>Pruritus</b> (gatal) atau nyeri persisten</li>
+        </ul>
+      </div>
+    </div>
+    <h3>ABCDE Rule untuk Melanoma:</h3>
+    <table class="data-table">
+      <tr><th>Huruf</th><th>Makna</th></tr>
+      <tr><td><b>A</b></td><td>Asymmetry (Asimetris)</td></tr>
+      <tr><td><b>B</b></td><td>Border (Batas tidak rata)</td></tr>
+      <tr><td><b>C</b></td><td>Color (Variasi warna)</td></tr>
+      <tr><td><b>D</b></td><td>Diameter (&gt;6mm)</td></tr>
+      <tr><td><b>E</b></td><td>Evolving (Berkembang)</td></tr>
+    </table>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-06')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-06')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-06')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-06"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-07">
+  <div class="content-header"><h1>🔬 Patologi Kulit</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Patologi Kulit</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👩‍🏫 Pengajar</div><div class="info-card-body">Erica Ayu Utami - Dept. Patologi Anatomi FK UNJA 2026</div></div>
+    <h2>🦠 Veruka (Kutil)</h2>
+    <div class="info-card">
+      <div class="info-card-title">Infeksi HPV pada Kulit</div>
+      <div class="info-card-body">
+        <ul>
+          <li>Infeksi virus tersering pada kulit dan mukosa</li>
+          <li>Disebabkan oleh <b>HPV</b> (Human Papillomavirus)</li>
+        </ul>
+      </div>
+    </div>
+    <h3>Histopatologi Veruka:</h3>
+    <ul>
+      <li><b>Hyperkeratosis</b>: penebalan lapisan tanduk</li>
+      <li><b>Papillomatosis</b>: pertumbuhan seperti jari/jeruk</li>
+      <li><b>Hypergranulosis</b>: penebalan lapisan butir</li>
+      <li><b>Koilosit</b>: sel epidermis dengan sitoplasma jernih dan inti membulat (ciri infeksi HPV)</li>
+    </ul>
+    <h2>⚫ Melanoma Malignum</h2>
+    <div class="info-card danger">
+      <div class="info-card-title">Tumor Ganas Paling Agresif Kulit</div>
+      <div class="info-card-body">
+        <ul>
+          <li>Berasal dari melanosit, mudah bermetastasis</li>
+          <li><b>Faktor prognosis</b>: ketebalan tumor (Breslow), ulserasi, tingkat invasi, mitosis</li>
+          <li><b>Terapi</b>: eksisi lebar, sentinel lymph node biopsy, imunoterapi, targetted therapy</li>
+        </ul>
+      </div>
+    </div>
+    <h2>🔷 Karsinoma Sel Basal (Basal Cell Carcinoma)</h2>
+    <ul>
+      <li>Tumor ganas paling umum pada manusia</li>
+      <li><b>Nodular</b>: paling umum, papula pearly dengan telangiektasia</li>
+      <li><b>Superficial</b>: plak eritematosa bersisik</li>
+      <li>Jarang metastasis tetapi lokal invasif</li>
+    </ul>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-07')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-07')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-07')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-07"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-08">
+  <div class="content-header"><h1>🧪 Pembuatan Sediaan Topikal</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Pembuatan Sediaan Topikal</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👩‍🏫 Pengajar</div><div class="info-card-body">apt. Puspa Dwi Pratiwi, S.Farm., M.Pharm.Sci - FKIK UNJA</div></div>
+    <h2>🧪 Topical Excipients (Bahan Tambahan)</h2>
+    <table class="data-table">
+      <tr><th>Kategori</th><th>Contoh</th><th>Fungsi</th></tr>
+      <tr><td><b>Emollients</b></td><td>Mineral oil, petrolatum</td><td>Pelembab, pelindung kulit</td></tr>
+      <tr><td><b>Emulsifiers</b></td><td>Cetearyl alcohol, polysorbate 80</td><td>Pengemulsi</td></tr>
+      <tr><td><b>Thickeners</b></td><td>Carbomers, xanthan gum</td><td>Pengental</td></tr>
+      <tr><td><b>Humectants</b></td><td>Glycerin, propylene glycol</td><td>Pelembab (menarik air)</td></tr>
+      <tr><td><b>Preservatives</b></td><td>Methylparaben, benzalkonium chloride</td><td>Pengawet</td></tr>
+    </table>
+    <h2>💊 Bentuk Sediaan Topikal</h2>
+    <h4>Ointments (Salep):</h4>
+    <ul>
+      <li>Semisolida untuk aplikasi eksternal</li>
+      <li>&lt;20% air dan volatiles, &gt;50% hidrokarbon/lilin/polyol sebagai vehicle</li>
+    </ul>
+    <h4>Cream (Krim):</h4>
+    <ul>
+      <li>Semisolid dengan konsistensi lembut, mudah diratakan</li>
+      <li>Water-in-oil (W/O) atau oil-in-water (O/W) emulsi</li>
+    </ul>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-08')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-08')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-08')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-08"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-09">
+  <div class="content-header"><h1>🐛 Penyakit Infestasi Tungau & Parasit</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Infestasi Tungau & Parasit</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👩‍⚕️ Pengajar</div><div class="info-card-body">Dr. Rini Chrisna, M.Ked(DV), SpDV</div></div>
+    <h2>🦟 Pedikulosis</h2>
+    <h3>Pedikulosis Kapitis (Tuma Kepala):</h3>
+    <div class="info-card">
+      <div class="info-card-body">
+        <ul>
+          <li><b>Definisi</b>: Infeksi kulit & rambut kepala oleh <i>Pediculus humanus var. capitis</i></li>
+          <li><b>Transmisi</b>: langsung atau melalui benda (sisir, bantal, kasur, topi)</li>
+          <li><b>Siklus hidup</b>: Telur → Larva → Nimfa → Kutu dewasa (30 hari)</li>
+        </ul>
+      </div>
+    </div>
+    <h4>Terapi:</h4>
+    <ul>
+      <li>Malathion 0.5% atau 1% (semalaman, 1×/minggu)</li>
+      <li>Emulsi benzil benzoat 25% (12 jam, diulang 4 hari)</li>
+    </ul>
+    <h2>🐛 Cutaneous Larva Migrans (CLM)</h2>
+    <div class="info-card warning">
+      <div class="info-card-title">Definisi</div>
+      <div class="info-card-body">Erupsi di kulit berupa penjalaran serpiginosa akibat reaksi hipersensitivitas terhadap invasi larva cacing tambang dari feses anjing & kucing.</div>
+    </div>
+    <ul>
+      <li><b>Terapi</b>: Albendazol 800 mg/hari 3 hari, Ivermectin 200 μg/hari 1-2 hari</li>
+    </ul>
+    <h2>🦟 Filariasis</h2>
+    <ul>
+      <li>Penyakit oleh infestasi cacing filaria: <i>Wuchereria bancrofti</i> atau <i>Brugia malayi</i></li>
+      <li><b>Manifestasi kronik</b>: hidrokel, kiluria, limfedema, <b>elephantiasis</b></li>
+      <li><b>Terapi</b>: Dietilcarbamazine 6 mg/kgBB/hari 12 hari</li>
+    </ul>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-09')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-09')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-09')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-09"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-10">
+  <div class="content-header"><h1>🔴 Skabies (Kudis)</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Skabies</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👩‍⚕️ Pengajar</div><div class="info-card-body">dr. Rini Chrisna, M.Ked(DV), SpDV</div></div>
+    <h2>📌 Definisi</h2>
+    <div class="info-card danger">
+      <div class="info-card-body">Skabies adalah penyakit kulit yang disebabkan oleh infestasi dan sensitisasi terhadap <b><i>Sarcoptes scabiei</i> var. <i>hominis</i></b>. Disebut juga <b>kudis</b> atau <b>gudik</b>.</div>
+    </div>
+    <h2>🌍 Epidemiologi</h2>
+    <ul>
+      <li>300 juta kasus di seluruh dunia setiap tahunnya</li>
+      <li>Urutan <b>ke-3</b> dari 12 penyakit kulit tersering di Indonesia</li>
+      <li><b>Transmisi</b>: kontak langsung dan tidak langsung (pakaian, sprei)</li>
+    </ul>
+    <h2>🏥 Temuan Klinis</h2>
+    <ul>
+      <li><b>Gatal sangat parah pada malam hari</b> (pruritus nokturna)</li>
+      <li>Lesi <b>polimorfik</b>: merah, bersisik, ekskoriasi, papul, nodul, vesikel</li>
+      <li><b>Predileksi</b>: sela jari, pergelangan tangan, siku, aksila, pusar, area genital</li>
+    </ul>
+    <h3>Tanda Kardinal (4 Tanda):</h3>
+    <table class="data-table">
+      <tr><th>No</th><th>Tanda</th><th>Deskripsi</th></tr>
+      <tr><td>1</td><td><b>Pruritus nokturna</b></td><td>Gatal hebat malam hari</td></tr>
+      <tr><td>2</td><td><b>Menyerang berkelompok</b></td><td>Anggota keluarga/kerabat juga gatal</td></tr>
+      <tr><td>3</td><td><b>Terowongan</b></td><td>Garis linear/belok di kulit</td></tr>
+      <tr><td>4</td><td><i><b>Sarcoptes scabiei</b></i></td><td>Menemukan tungau di kerokan kulit</td></tr>
+    </table>
+    <h2>💊 Terapi Skabies</h2>
+    <table class="data-table">
+      <tr><th>Obat</th><th>Cara Pakai</th><th>Keterangan</th></tr>
+      <tr><td><b>Permethrin 5% cream</b></td><td>8 jam, bilas. Ulang 1 minggu.</td><td>Lini pertama. Aman >2 bulan.</td></tr>
+      <tr><td><b>Ivermectin 200 μg/kg</b></td><td>Dosis tunggal, ulang 10-14 hari</td><td>Untuk skabies berkrusta & resisten.</td></tr>
+    </table>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-10')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-10')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-10')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-10"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-11">
+  <div class="content-header"><h1>👂 Tumor-Tumor pada Organ THT</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Tumor Organ THT</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👩‍🏫 Pengajar</div><div class="info-card-body">Erica Ayu Utami - Dept. Patologi Anatomi FK UNJA 2026</div></div>
+    <h2>👂 Tumor Telinga Luar</h2>
+    <table class="data-table">
+      <tr><th>Tumor</th><th>Jenis</th><th>Ciri Khas</th></tr>
+      <tr><td><b>Papilloma skuamosa</b></td><td>Jinak</td><td>HPV tipe 6 & 11, hiperkeratosis, papillomatosis, koilositosis.</td></tr>
+      <tr><td><b>Keratoacanthoma</b></td><td>Ganas</td><td>Usia >60, batas tegas, sentral keratin.</td></tr>
+      <tr><td><b>Karsinoma sel skuamosa</b></td><td>Ganas</td><td>Usia ~60, lesi prekursor: solar keratosis.</td></tr>
+      <tr><td><b>Melanoma malignum</b></td><td>Ganas</td><td>Daun telinga. Mudah metastasis & rekurensi.</td></tr>
+    </table>
+    <h3>B. Tumor Kelenjar Seruminosa:</h3>
+    <table class="data-table">
+      <tr><th>Tumor</th><th>Jenis</th><th>Ciri Khas</th></tr>
+      <tr><td><b>Ceruminal gland adenoma</b></td><td>Jinak</td><td>Massa CAE, bilateralayered, no atypia.</td></tr>
+      <tr><td><b>Adenoid cystic carcinoma</b></td><td>Ganas</td><td>Mudah menginfiltrasi saraf, rekurensi tinggi.</td></tr>
+    </table>
+    <h2>🗣️ Nasofaring</h2>
+    <h3>Nasopharyngeal Carcinoma:</h3>
+    <div class="info-card danger">
+      <div class="info-card-body">
+        <ul>
+          <li>Tumor dari mukosa nasofaring</li>
+          <li><b>Etiologi</b>: Virus EBV, merokok, alkohol, makanan tinggi garam</li>
+        </ul>
+      </div>
+    </div>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-11')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-11')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-11')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-11"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-12">
+  <div class="content-header"><h1>⚡ Understanding Hypersensitivity</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Hipersensitivitas</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">📚 Materi Visual Lengkap</div><div class="info-card-body">Materi komprehensif tentang reaksi hipersensitivitas dan manifestasi klinisnya pada kulit.</div></div>
+    <h2>🔬 Klasifikasi Hipersensitivitas (Gell & Coombs)</h2>
+    <table class="data-table">
+      <tr><th>Tipe</th><th>Nama</th><th>Mekanisme</th><th>Contoh Dermatologi</th></tr>
+      <tr><td><b>I</b></td><td>Anafilaktik</td><td>IgE → degranulasi mast cell</td><td>Urticaria, angioedema, anafilaksis</td></tr>
+      <tr><td><b>II</b></td><td>Sitotoksik</td><td>IgG/IgM → kerusakan sel target</td><td>Pemphigus vulgaris, bullous pemphigoid</td></tr>
+      <tr><td><b>III</b></td><td>Kompleks Imun</td><td>Kompleks antigen-antibodi → deposisi</td><td>Vaskulitis leukositoklastika, SLE</td></tr>
+      <tr><td><b>IV</b></td><td>Cell-mediated</td><td>Sel T sensitized → sitokin</td><td>Dermatitis kontak alergi, tuberkulin test</td></tr>
+    </table>
+    <h2>💊 Drug Hypersensitivity</h2>
+    <div class="info-card warning">
+      <div class="info-card-title">Reaksi Obat yang Perlu Diwaspadai</div>
+      <div class="info-card-body">
+        <table class="data-table">
+          <tr><th>Sindrom</th><th>Ciri Khas</th></tr>
+          <tr><td><b>SJS</b></td><td>Erosi mukosa + targetoid lesions, &lt;10% BSA</td></tr>
+          <tr><td><b>TEN</b></td><td>Sama seperti SJS tapi &gt;30% BSA</td></tr>
+          <tr><td><b>DRESS</b></td><td>Demam, rash, eosinofilia, hepatitis</td></tr>
+          <tr><td><b>AGEP</b></td><td>Pustula steril pada eritroderma, demam</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-12')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-12')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-12')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-12"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-13">
+  <div class="content-header"><h1>🔷 Urticaria</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Urticaria</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">📚 Bahan Ajar 2026</div><div class="info-card-body">Materi lengkap tentang urticaria (biduran): definisi, klasifikasi, etiologi, patogenesis, diagnosis, dan tatalaksana.</div></div>
+    <h2>📌 Definisi</h2>
+    <div class="info-card">
+      <div class="info-card-body"><b>Urticaria</b> adalah manifestasi kulit berupa <b>edema superfisial dermis</b> akibat pelepasan histamin dan mediator inflamasi lainnya dari mast cell. Ditandai dengan lesi kemerahan (eritema), gatal (pruritus), dan membengkak yang muncul tiba-tiba.</div>
+    </div>
+    <h2>🔬 Klasifikasi</h2>
+    <table class="data-table">
+      <tr><th>Berdasarkan Durasi</th><th>Berdasarkan Etiologi</th></tr>
+      <tr>
+        <td>
+          <ul>
+            <li><b>Akut</b>: &lt;6 minggu</li>
+            <li><b>Kronik</b>: &gt;6 minggu</li>
+          </ul>
+        </td>
+        <td>
+          <ul>
+            <li><b>Spontan</b>: tanpa pemicu jelas</li>
+            <li><b>Induksi</b>: dengan pemicu yang jelas</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <h2>💊 Tatalaksana</h2>
+    <table class="data-table">
+      <tr><th>Obat</th><th>Dosis</th><th>Keterangan</th></tr>
+      <tr><td><b>H1 antihistamin generasi 2</b></td><td>1×/hari</td><td>First line. Bisa ditingkatkan 2-4× untuk refrakter.</td></tr>
+      <tr><td><b>Omalizumab</b></td><td>150-300 mg/4 minggu SC</td><td>Untuk urticaria kronik refrakter.</td></tr>
+      <tr><td><b>Siklosporin</b></td><td>3-5 mg/kg/hari</td><td>Untuk refrakter terhadap omalizumab.</td></tr>
+    </table>
+    <h3>3. Emergency Treatment (Anafilaksis):</h3>
+    <div class="info-card danger">
+      <div class="info-card-title">🚨 URGENT!</div>
+      <div class="info-card-body">
+        <ol>
+          <li><b>Adrenalin (epinefrin)</b> 0.3-0.5 mg IM (anterolateral thigh)</li>
+          <li><b>H1 antihistamin</b> IV</li>
+          <li><b>Kortikosteroid</b> IV</li>
+          <li><b>Oksigen</b>, posisi supine, cairan IV</li>
+        </ol>
+      </div>
+    </div>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-13')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-13')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-13')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-13"></div>
+  </div>
+</div>
+
+<div class="view" id="slide-14">
+  <div class="content-header"><h1>✂️ Vulnus Laseratum</h1></div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Vulnus Laseratum</span></div>
+  <div class="content-area">
+    <div class="info-card"><div class="info-card-title">👩‍⚕️ Pengajar</div><div class="info-card-body">Dr. Rini Chrisna, M.Ked(DV), SpDV</div></div>
+    <h2>📌 Definisi</h2>
+    <div class="info-card">
+      <div class="info-card-body"><b>Vulnus</b> (luka) adalah <b>hilangnya kontinuitas jaringan</b> yang mengganggu proses seluler normal akibat <b>trauma, kimiawi, listrik, radiasi</b>.</div>
+    </div>
+    <h2>📋 Klasifikasi Luka</h2>
+    <table class="data-table">
+      <tr><th>Jenis Vulnus</th><th>Definisi</th></tr>
+      <tr><td><b>Vulnus ekskoriasi</b></td><td>Luka akibat gesekan dengan benda keras.</td></tr>
+      <tr><td><b>Vulnus laseratum</b></td><td>Luka akibat kekerasan benda tumpul, goresan, jatuh.</td></tr>
+      <tr><td><b>Vulnus punctum</b></td><td>Luka akibat tusukan benda tajam → luka sempit dan dalam.</td></tr>
+      <tr><td><b>Vulnus morsum</b></td><td>Luka akibat gigitan manusia atau hewan.</td></tr>
+      <tr><td><b>Vulnus contussum</b></td><td>Luka akibat pecahnya pembuluh darah di bawah kulit (memar).</td></tr>
+    </table>
+    <h2>🔄 Fase Penyembuhan Luka</h2>
+    <table class="data-table">
+      <tr><th>Fase</th><th>Waktu</th><th>Proses</th></tr>
+      <tr><td><b>1. Hemostasis & Inflamasi</b></td><td>0-4 hari</td><td>Vasokonstriksi → pembekuan → inflamasi → fagositosis</td></tr>
+      <tr><td><b>2. Proliferasi</b></td><td>4-21 hari</td><td>Angiogenesis, fibroplasia, epitelisasi, kontraksi</td></tr>
+      <tr><td><b>3. Remodeling</b></td><td>21 hari - 2 tahun</td><td>Kolagen tipe III → tipe I, kekuatan max 80%</td></tr>
+    </table>
+    <h2>💊 Penatalaksanaan Luka</h2>
+    <h3>Antiseptik yang Digunakan:</h3>
+    <table class="data-table">
+      <tr><th>Antiseptik</th><th>Spektrum</th><th>Catatan</th></tr>
+      <tr><td><b>Povidone iodine</b></td><td>Luas</td><td>Tidak toksik pada jaringan granulasi.</td></tr>
+      <tr><td><b>Chlorhexidine</b></td><td>Luas</td><td>Residu activity. Ototoksis (hindari telinga/mata).</td></tr>
+      <tr><td><b>Hydrogen peroxide</b></td><td>Luas</td><td>Oksidatif. Toksis pada fibroblast.</td></tr>
+      <tr><td><b>Silver sulfadiazine</b></td><td>Luas</td><td>Untuk luka bakar. Kontraindikasi: sulfa allergy.</td></tr>
+    </table>
+    <div class="section-actions">
+      <button class="pill-btn primary" onclick="showQuiz('slide-14')">📝 Kerjakan Quiz</button>
+      <button class="pill-btn" onclick="showFlashcards('slide-14')">🎴 Flashcards</button>
+      <button class="pill-btn" onclick="openNote('slide-14')">📝 Catatan</button>
+    </div>
+    <div id="quiz-slide-14"></div>
+  </div>
+</div>
+
+<div class="view" id="exam">
+  <div class="content-header">
+    <h1>📝 Simulasi Ujian</h1>
+    <div class="timer" id="examTimer">60:00</div>
+  </div>
+  <div class="breadcrumb"><a onclick="showView('dashboard')">Dashboard</a><span class="separator">/</span><span>Simulasi Ujian</span></div>
+  <div class="exam-header">
+    <div>
+      <div style="color: var(--text-2); font-size: 0.9rem; margin-bottom: 0.5rem;">Soal <span id="examCurrent">1</span> dari <span id="examTotal">20</span></div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="pill-btn" id="flagBtn" onclick="flagQuestion()">🚩 Tandai</button>
+        <button class="pill-btn" onclick="prevExamQuestion()">◀ Sebelumnya</button>
+        <button class="pill-btn" onclick="nextExamQuestion()">Selanjutnya ▶</button>
+      </div>
+    </div>
+    <button class="pill-btn" onclick="finishExam()" style="background: var(--danger); color: white; border-color: var(--danger);">✓ Selesai</button>
+  </div>
+  <div id="examQuestionContainer"></div>
+  <div class="exam-nav" id="examNav"></div>
+</div>
+
+<div class="view" id="exam-result">
+  <div class="exam-result glass" style="margin-top: 2rem;">
+    <h2>🎉 Hasil Ujian</h2>
+    <div class="score-circle" id="scoreCircle" data-score="0%" style="--score-deg: 0deg;"><span></span></div>
+    <div id="resultDetails" style="color: var(--text-2); line-height: 2;"></div>
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <button class="pill-btn primary" onclick="reviewExam()">📖 Review</button>
+      <button class="pill-btn primary" onclick="startExam()">🔄 Ulang</button>
+      <button class="pill-btn" onclick="showView('dashboard')">🏠 Dashboard</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ===== DATA =====
+const quotes = [
+  { text: "Kesuksesan bukanlah kunci kebahagiaan. Kebahagiaan adalah kunci kesuksesan. Jika kamu mencintai apa yang kamu lakukan, kamu akan berhasil.", author: "Albert Schweitzer", day: 1 },
+  { text: "Jangan pernah menyerah pada impianmu. Hanya dengan tekad yang kuat, kamu bisa mencapai apa pun yang kamu inginkan.", author: "Harriet Tubman", day: 2 },
+  { text: "Pendidikan adalah senjata paling ampuh yang bisa kamu gunakan untuk mengubah dunia dan masa depanmu sendiri.", author: "Nelson Mandela", day: 3 },
+  { text: "Setiap hari adalah kesempatan baru untuk belajar dan tumbuh. Manfaatkan waktu sebaik-baiknya.", author: "Dalai Lama", day: 4 },
+  { text: "Kegagalan adalah guru terbaik. Dari kegagalan, kita belajar cara untuk menjadi lebih baik dan lebih kuat.", author: "Oprah Winfrey", day: 5 },
+  { text: "Kesehatan adalah harta yang paling berharga. Jaga tubuhmu dengan baik karena itu adalah satu-satunya tempat tinggal yang kamu miliki.", author: "Jim Rohn", day: 6 },
+  { text: "Dokter masa depan tidak akan memberikan obat, tetapi akan mengajarkan pasiennya tentang gaya hidup sehat.", author: "Thomas Edison", day: 7 },
+  { text: "Pengetahuan adalah kekuatan. Informasi adalah membebaskan. Pendidikan adalah premis kemajuan setiap masyarakat.", author: "Kofi Annan", day: 8 },
+  { text: "Jadilah perubahan yang ingin kamu lihat di dunia. Mulailah dari diri sendiri, mulai dari hari ini.", author: "Mahatma Gandhi", day: 9 },
+  { text: "Tidak ada jalan pintas menuju tempat yang layak dituju. Kerja keras dan konsistensi adalah kuncinya.", author: "Beverly Sills", day: 10 },
+  { text: "Semangatmu adalah api yang menyala di dalam dirimu. Biarkan api itu membimbing langkahmu setiap hari.", author: "Rumi", day: 11 },
+  { text: "Setiap langkah kecil yang kamu ambil hari ini adalah investasi untuk masa depan yang lebih baik esok hari.", author: "Benjamin Franklin", day: 12 },
+  { text: "Jangan takut untuk memulai dari awal. Setiap ahli pernah menjadi pemula yang penuh semangat.", author: "Helen Hayes", day: 13 },
+  { text: "Belajar tidak pernah habis. Hidup adalah perjalanan pembelajaran yang terus berlanjut hingga akhir hayat.", author: "Michelangelo", day: 14 },
+  { text: "Kamu lebih kuat dari yang kamu kira, lebih berbakat dari yang kamu sadari, dan mampu lebih dari yang kamu bayangkan.", author: "A.A. Milne", day: 15 },
+  { text: "Seorang dokter yang baik menyembuhkan penyakit. Dokter hebat mencegah penyakit dan menginspirasi hidup sehat.", author: "Sun Tzu", day: 16 },
+  { text: "Ketika kamu merasa lelah, ingatlah mengapa kamu memulai. Tujuanmu lebih besar dari rasa lelah sementara.", author: "Vince Lombardi", day: 17 },
+  { text: "Ilmumu adalah cahaya yang akan menerangi jalanmu. Teruslah belajar dan cahaya itu akan semakin terang.", author: "Aristoteles", day: 18 },
+  { text: "Jangan bandingkan dirimu dengan orang lain. Bandingkan dirimu dengan orang yang kamu were kemarin.", author: "Jordan Peterson", day: 19 },
+  { text: "Kesabaran dan ketekunan adalah sifat-sifat mulia yang akan membawamu menuju kesuksesan yang berkelanjutan.", author: "Confucius", day: 20 },
+  { text: "Pikiran positif adalah vitamin untuk jiwa. Konsumsilah setiap hari untuk kesehatan mental yang optimal.", author: "Louise Hay", day: 21 },
+  { text: "Kamu tidak perlu melihat seluruh tangga, cukup ambil langkah pertama dengan keyakinan.", author: "Martin Luther King Jr.", day: 22 },
+  { text: "Ilmu kedokteran adalah seni dan sains bersatu. Kedokteran yang baik membutuhkan kedua hal tersebut.", author: "William Osler", day: 23 },
+  { text: "Orang yang berhenti belajar adalah orang yang menua, seberapa pun usianya. Orang yang terus belajar akan selalu muda.", author: "Henry Ford", day: 24 },
+  { text: "Ketika pasien datang kepada dokter, mereka mempercayakan nyawa dan harapan mereka. Jagalah amanah itu dengan sungguh-sungguh.", author: "Hippocrates", day: 25 },
+  { text: "Jadilah sumber cahaya di tempat yang gelap. Kebaikan dan pengetahuanmu akan menyentuh banyak orang.", author: "Buddha", day: 26 },
+  { text: "Kerja keras mengalahkan bakat ketika bakat tidak bekerja keras. Dedikasi adalah segalanya.", author: "Tim Notke", day: 27 },
+  { text: "Sehat bukan sekadar bebas dari penyakit. Sehat adalah keadaan sejahtera fisik, mental, dan sosial yang utuh.", author: "WHO", day: 28 },
+  { text: "Setiap hari adalah hadiah baru yang Tuhan berikan. Bersyukurlah dan gunakan dengan sebaik-baiknya.", author: "Anonymous", day: 29 },
+  { text: "Percayalah pada dirimu sendiri. Kamu memiliki segala yang dibutuhkan untuk menjadi dokter yang luar biasa.", author: "Anonymous", day: 30 }
+];
+
+const flashcards = [
+  { front: "Sarcoptes scabiei", back: "Tungau penyebab skabies/kudis. Diameter 0.3mm, 4 pasang kaki, hidup di stratum korneum. Gatal parah malam hari (pruritus nokturna)." },
+  { front: "Pruritus Nokturna", back: "Gatal yang sangat hebat pada malam hari. Ciri khas skabies dan beberapa kondisi dermatologis lainnya." },
+  { front: "Melanin", back: "Pigmen utama yang menentukan warna kulit. Diproduksi oleh melanosit di basal layer epidermis." },
+  { front: "Vitiligo", back: "Penyakit depigmentasi akibat hilangnya melanosit fungsional → makula putih berbatas tegas. Dapat melibatkan kulit, rambut, dan mukosa." },
+  { front: "Melasma", back: "Hipermelanosis pada wajah (pipi, dahi, hidung, dagu). Disebabkan oleh sinar UV, hormonal (kehamilan, KB). Dikenal juga sebagai 'mask of pregnancy'." },
+  { front: "Stratum Corneum", back: "Lapisan terluar epidermis yang terdiri dari sel-sel mati berisi keratin. Berfungsi sebagai barrier utama kulit terhadap lingkungan." },
+  { front: "PUVA", back: "Psoralen + UVA. Terapi fotokemoterapi untuk vitiligo dan psoriasis. Psoralen bersifat fotodinamik yang menyerap energi radiasi." },
+  { front: "Permethrin 5%", back: "Skabisid piretroid sintesis. Lini pertama untuk skabies. Oleskan 8-14 jam ke seluruh tubuh, bilas. Tingkat kesembuhan 97.8%." },
+  { front: "TBSA", back: "Total Body Surface Area. Metode penilaian luas luka bakar: Rule of Nines, Lund & Browder Chart, atau 1 telapak tangan = 1%." },
+  { front: "Dermatofita", back: "Jamur yang menyebabkan tinea/kurap. 3 genus: Epidermophyton, Trichophyton, Microsporum. Mencerna keratin via enzim keratinase." },
+  { front: "Koilosit", back: "Sel epidermis dengan sitoplasma jernih dan inti membulat. Ciri khas infeksi HPV pada histopatologi veruka/kutil." },
+  { front: "Keloid", back: "Fibrosis berlebih pasca-trauma yang melampaui batas luka asli. Kolagen tebal merah muda tersusun tidak beraturan. Sering pada usia <30 tahun." },
+  { front: "Hipersensitivitas Tipe I", back: "Reaksi anafilaktik. IgE → degranulasi mast cell → histamin, leukotrien. Contoh: urticaria, anafilaksis, rhinitis alergi." },
+  { front: "Hipersensitivitas Tipe IV", back: "Reaksi terselubung/cell-mediated. Sel T sensitized → sitokin → inflamasi. Contoh: dermatitis kontak alergi, tuberkulin test." },
+  { front: "Schwannoma", back: "Tumor jinak dari sel Schwann (nervus vestibularis = acoustic neuroma). Tumbuh lambat, batas tegas. Gejala: gangguan dengar, tinitus, vertigo." },
+  { front: "Kolesteatoma", back: "Cystic mass of keratin squames di telinga tengah. Bukan neoplasma. 'Pearly grey' structure. Merusak tulang, rekurensi bila eksisi tidak sempurna." },
+  { front: "Omalizumab", back: "Anti-IgE monoclonal antibody. Terapi urticaria kronik refrakter. Dosis 150-300 mg SC setiap 4 minggu." },
+  { front: "Ivermectin", back: "Antihelmintik broad-spectrum. Untuk skabies (200 μg/kg oral) dan kutu. Mekanisme: meningkatkan permeabilitas ion klorida di saraf invertebrata." },
+  { front: "Filariasis", back: "Penyakit oleh cacing filaria (Wuchereria bancrofti, Brugia malayi). Vektor: nyamuk. Manifestasi kronik: elephantiasis, hidrokel, kiluria." },
+  { front: "Albinisme", back: "Hilangnya pigmen melanin akibat mutasi gen tirosinase (OCA1) atau gen lain. Kulit putih, rambut putih, mata biru. Predisposisi kanker kulit." }
+];
+
+const wordGuessWords = [
+  { word: "SKABIES", hint: "Penyakit kulit menular yang disebabkan oleh tungau Sarcoptes scabiei. Gatal hebat di malam hari." },
+  { word: "VITILIGO", hint: "Penyakit depigmentasi dengan makula putih berbatas tegas akibat hilangnya melanosit." },
+  { word: "MELASMA", hint: "Hiperpigmentasi pada wajah yang disebabkan oleh sinar UV dan faktor hormonal." },
+  { word: "MELANIN", hint: "Pigmen utama yang menentukan warna kulit, diproduksi oleh melanosit." },
+  { word: "ALBINISME", hint: "Kondisi genetik dengan hilangnya pigmen melanin pada kulit, rambut, dan mata." },
+  { word: "KOILOSIT", hint: "Sel epidermis dengan sitoplasma jernih dan inti membulat, ciri khas infeksi HPV." },
+  { word: "KELOID", hint: "Fibrosis berlebih pasca-trauma yang melampaui batas luka asli." },
+  { word: "LUPUS", hint: "Penyakit autoimun yang dapat mempengaruhi kulit, sendi, ginjal, dan organ lainnya." },
+  { word: "URTICARIA", hint: "Manifestasi kulit berupa edema dermis akibat degranulasi mast cell, juga disebut biduran." },
+  { word: "FILARIASIS", hint: "Penyakit oleh cacing filaria yang ditularkan oleh nyamuk, dapat menyebabkan elephantiasis." },
+  { word: "IVERMECTIN", hint: "Obat antihelmintik yang digunakan untuk skabies dengan dosis 200 μg/kg." },
+  { word: "DERMATOFITA", hint: "Jamur yang menyebabkan tinea/kurap, terdiri dari 3 genus utama." },
+  { word: "SCHWANNOMA", hint: "Tumor jinak dari sel Schwann, sering di nervus vestibularis." },
+  { word: "PUVA", hint: "Terapi fotokemoterapi menggunakan psoralen dan UVA untuk vitiligo." },
+  { word: "OMALIZUMAB", hint: "Anti-IgE monoclonal antibody untuk urticaria kronik refrakter." }
+];
+
+const quizData = {
+  "slide-01": [
+    { q: "Tungau penyebab skabies disebut?", options: ["Demodex folliculorum", "Sarcoptes scabiei", "Pediculus humanus", "Leptotrombidium spp"], correct: 1, explanation: "Sarcoptes scabiei var. hominis adalah tungau yang menyebabkan skabies (kudis)." },
+    { q: "Berapa pasang kaki dimiliki Sarcoptes scabiei?", options: ["2 pasang", "3 pasang", "4 pasang", "5 pasang"], correct: 2, explanation: "S. scabiei memiliki 4 pasang kaki, berbeda dari serangga yang memiliki 3 pasang." },
+    { q: "Manakah yang BUKAN famili dalam ordo Acarina?", options: ["SARCOPTIDAE", "TROMBICULIDAE", "CULICIDAE", "DEMODICIDAE"], correct: 2, explanation: "CULICIDAE adalah famili nyamuk yang termasuk ordo Diptera, bukan Acarina." },
+    { q: "Apa nama lain untuk tinea versicolor?", options: ["Panu", "Kadas", "Kurap", "Bisul"], correct: 0, explanation: "Tinea versicolor disebut juga panu, disebabkan oleh Malassezia furfur." },
+    { q: "3 genus dermatofita yang penting adalah?", options: ["Candida, Aspergillus, Rhizopus", "Epidermophyton, Trichophyton, Microsporum", "Penicillium, Fusarium, Mucor", "Cryptococcus, Histoplasma, Blastomyces"], correct: 1, explanation: "Tiga genus dermatofita: Epidermophyton, Trichophyton, dan Microsporum." }
+  ],
+  "slide-02": [
+    { q: "Penyakit depigmentasi dengan makula putih susu adalah?", options: ["Melasma", "Vitiligo", "Tinea versicolor", "Post-inflammatory hyperpigmentation"], correct: 1, explanation: "Vitiligo: depigmentasi berbatas tegas akibat hilangnya melanosit fungsional." },
+    { q: "Perbandingan wanita:laki-laki pada melasma adalah?", options: ["5:1", "10:1", "24:1", "1:1"], correct: 2, explanation: "Melasma jauh lebih sering pada wanita, perbandingan 24:1." },
+    { q: "Terapi lini pertama untuk vitiligo localized adalah?", options: ["PUVA", "Kortikosteroid topikal", "Omalizumab", "Takrolimus oral"], correct: 1, explanation: "Kortikosteroid topikal direkomendasikan sebagai first line untuk vitiligo localized, terutama di wajah." },
+    { q: "Apa yang dimaksud dengan fenomena Koebner?", options: ["Depigmentasi di lokasi trauma", "Gatal di malam hari", "Lesi bersisik", "Pembengkakan kelenjar getah bening"], correct: 0, explanation: "Fenomena Koebner: munculnya lesi baru di tempat trauma (goresan, sayatan) pada pasien vitiligo." },
+    { q: "Berapa dosis hidrokinon untuk melasma?", options: ["0.1-0.5%", "2-5%", "10-15%", "20-30%"], correct: 1, explanation: "Hidrokinon untuk melasma: 2-5%, dipakai malam hari selama 6-8 minggu hingga 6 bulan." }
+  ],
+  "slide-03": [
+    { q: "Antibiotik yang kontraindikasi pada kehamilan dan anak <8 tahun adalah?", options: ["Amoxicillin", "Cefadroxil", "Tetrasiklin", "Metronidazole"], correct: 2, explanation: "Tetrasiklin, minocycline, dan doxycycline kontraindikasi pada kehamilan dan anak <8 tahun karena discolouration gigi." },
+    { q: "Obat terbaik oral untuk akne berat adalah?", options: ["Doxycycline", "Isotretinoin", "Minocycline", "Erythromycin"], correct: 1, explanation: "Isotretinoin (13-cis-retinoic acid) adalah obat oral terbaik untuk akne berat/nodular. Kontraindikasi: kehamilan." },
+    { q: "MDT untuk kusta multibasiler terdiri dari berapa obat?", options: ["1 obat", "2 obat", "3 obat", "4 obat"], correct: 2, explanation: "MDT multibasiler: Rifampicin + Dapsone + Clofazimine (3 obat). Pausibasiler hanya 2 obat." },
+    { q: "Terapi pilihan untuk ENL (Reaksi Tipe 2 Kusta) adalah?", options: ["Prednison", "Thalidomide", "Dapsone", "Rifampicin"], correct: 1, explanation: "Thalidomide 100-300 mg/hari adalah terapi pilihan untuk Erythema Nodosum Leprosum (ENL). Kontraindikasi: kehamilan." },
+    { q: "Berapa durasi MDT untuk kusta pausibasiler?", options: ["3 bulan", "6 bulan", "12 bulan", "24 bulan"], correct: 1, explanation: "Durasi MDT pausibasiler: 6 bulan. Multibasiler: 12 bulan." }
+  ],
+  "slide-04": [
+    { q: "Luka bakar derajat IIa (superficial partial) menyebabkan?", options: ["Lesi kering pucat", "Lepuh jernih dasar merah muda", "Eritema tanpa lepuh", "Nekrosis hitam"], correct: 1, explanation: "Derajat IIa: lepuh jernih, dasar merah muda, sangat nyeri, sensasi rambut ada. Penyembuhan 1-2 minggu tanpa scar." },
+    { q: "Metode perhitungan luas luka bakar pada anak yang lebih akurat adalah?", options: ["Rule of Nines", "Lund & Browder Chart", "1 telapak tangan = 2%", "Visual estimation"], correct: 1, explanation: "Lund & Browder Chart lebih akurat karena memperhitungkan proporsi anatomi yang berbeda antara anak dan dewasa." },
+    { q: "Kapan resusitasi cairan IV diindikasikan pada luka bakar?", options: [">5% TBSA", ">10% TBSA", ">20% TBSA", ">50% TBSA"], correct: 2, explanation: "Luas luka bakar >20% TBSA memerlukan resusitasi cairan IV (Ringer Laktat atau D5%)." },
+    { q: "Apa komplikasi luka bakar tersering?", options: ["Sepsis", "Jaringan parut hipertrofi", "Kontraktur", "Karsinoma"], correct: 1, explanation: "Jaringan parut hipertrofi adalah komplikasi luka bakar tersering, memerlukan compression garment hingga 1 tahun." },
+    { q: "Vaksinasi apa yang diberikan untuk seluruh luka bakar partial & full thickness?", options: ["Hepatitis B", "Tetanus toxoid", "Influenza", "Rabies"], correct: 1, explanation: "Tetanus toxoid diberikan untuk semua luka bakar partial dan full thickness." }
+  ],
+  "slide-05": [
+    { q: "Rash malar pada lupus membentuk pola seperti?", options: ["Lingkaran", "Sayap kupu-kupu", "Garis", "Bintik-bintik"], correct: 1, explanation: "Rash malar: bentuk seperti sayap kupu-kupu di pipi dan hidung, tidak melibatki lipatan nasolabial." },
+    { q: "Berapa persen DLE (Diskoid Lupus Erythematosus) yang berkembang ke SLE?", options: ["1-2%", "5-10%", "50-60%", "90-100%"], correct: 1, explanation: "5-10% kasus DLE berkembang menjadi SLE (Sistemik Lupus Erythematosus)." },
+    { q: "Autoantibodi yang spesifik untuk SLE adalah?", options: ["Anti-Ro/SSA", "Anti-dsDNA dan anti-Sm", "Anti-RNP", "Anti-histone"], correct: 1, explanation: "Anti-dsDNA dan anti-Sm (Smith) adalah autoantibodi yang spesifik untuk SLE." },
+    { q: "Terapi first line untuk CLE (Cutaneous Lupus Erythematosus) adalah?", options: ["Siklofosfamid", "Antimalaria (hidroksiklorokuin)", "Metotreksat", "Rituximab"], correct: 1, explanation: "Antimalaria (hidroksiklorokuin) adalah terapi first line dan maintenance untuk CLE." },
+    { q: "Sindrom yang menyebabkan erosi mukosa <10% BSA disebut?", options: ["TEN", "SJS", "DRESS", "AGEP"], correct: 1, explanation: "SJS (Steven-Johnson Syndrome): erosi mukosa + targetoid lesions dengan <10% BSA. TEN: >30% BSA." }
+  ],
+  "slide-06": [
+    { q: "Diameter berapa yang menjadi tanda kecurigaan melanoma?", options: [">3mm", ">6mm", ">10mm", ">20mm"], correct: 1, explanation: "Diameter >6mm (ukuran pensil) adalah salah satu kriteria ABCDE untuk melanoma." },
+    { q: "Apa artinya 'E' dalam ABCDE rule?", options: ["Elevated", "Evolving", "Erythema", "Elastic"], correct: 1, explanation: "E = Evolving (berkembang): perubahan ukuran, bentuk, warna, atau gejala." },
+    { q: "Pemeriksaan non-invasif untuk menilai lesi pigmen adalah?", options: ["Biopsi", "Dermatoskopi", "CT scan", "MRI"], correct: 1, explanation: "Dermatoskopi adalah pemeriksaan non-invasif dengan dermatoscope untuk menilai struktur lesi pigmen." },
+    { q: "Tumor ganas paling umum pada kulit adalah?", options: ["Melanoma", "Karsinoma sel skuamosa", "Karsinoma sel basal", "Sarcoma"], correct: 2, explanation: "Karsinoma sel basal (BCC) adalah tumor ganas kulit paling umum. Jarang metastasis tetapi lokal invasif." },
+    { q: "Benjolan berwarna kuning di kelopak mata yang terkait hiperlipidemia disebut?", options: ["Keloid", "Xanthelasma", "Nevus", "Dermatofibroma"], correct: 1, explanation: "Xanthelasma: lesi kuning di kelopak mata, terkait dengan gangguan metabolisme lipid dan hiperlipidemia." }
+  ],
+  "slide-07": [
+    { q: "Ciri histopatologi khas infeksi HPV pada kutil adalah?", options: ["Nekrosis", "Koilositosis", "Miosis", "Fibrosis"], correct: 1, explanation: "Koilositosis: sel epidermis dengan sitoplasma jernih dan inti membulat, ciri khas infeksi HPV." },
+    { q: "Tumor jinak tersering pada kulit adalah?", options: ["Nevus", "Polip fibroepitelial (skin tag)", "Seboroik keratosis", "Lipoma"], correct: 1, explanation: "Polip fibroepitelial (skin tag) adalah tumor kulit tersering, terutama pada usia >50 tahun." },
+    { q: "Kolagen yang tersusun tidak beraturan pada keloid disebut?", options: ["Normal collagen", "Keloidal collagen", "Type IV collagen", "Elastic collagen"], correct: 1, explanation: "Keloidal collagen: kolagen tebal panjang warna merah muda yang tersusun tidak beraturan." },
+    { q: "Sel makrofag yang mengandung lipid pada xanthoma disebut?", options: ["Plasma cell", "Foam cell", "Mast cell", "Langerhans cell"], correct: 1, explanation: "Foam cell: makrofag yang mengandung lipid, ciri khas xanthoma. Terkait hiperlipidemia." },
+    { q: "Sebaseous carcinoma sering muncul di daerah mana?", options: ["Punggung", "Periokular (sekitar mata)", "Telapak kaki", "Bokong"], correct: 1, explanation: "Sebaseous carcinoma: lokasi tersering daerah periokular dan kepala-leher karena banyaknya kelenjar sebasea." }
+  ],
+  "slide-08": [
+    { q: "Bentuk sediaan topikal dengan >50% hidrokarbon dan <20% air adalah?", options: ["Krim", "Gel", "Ointment (Salep)", "Lotion"], correct: 2, explanation: "Ointment (salep): >50% hidrokarbon/lilin/polyol, <20% air. Sifat oklusif, pelindung." },
+    { q: "Syarat molekul obat untuk penetrasi melalui stratum corneum: MW harus?", options: ["<<100 Da", "<500 Da", "<1000 Da", ">5000 Da"], correct: 1, explanation: "Untuk penetrasi SC: MW < ~500 Da, log P 0-5, sedikit ikatan hidrogen." },
+    { q: "Bahan tambahan yang berfungsi sebagai pelembab dan menarik air adalah?", options: ["Emulsifier", "Humectant", "Preservative", "Surfactant"], correct: 1, explanation: "Humectant: glycerin, propylene glycol, sorbitol. Menarik air ke stratum corneum." },
+    { q: "Bentuk sediaan topikal yang bersifat 'grease-less' adalah?", options: ["Ointment", "Cream", "Gel", "Paste"], correct: 2, explanation: "Gel bersifat grease-less (tidak berminyak), water-soluble, mudah dibersihkan." },
+    { q: "Uji untuk menentukan kekuatan/kandungan obat dalam sediaan disebut?", options: ["Sterility test", "Assay", "Viscosity test", "Microbial limit"], correct: 1, explanation: "Assay: uji spesifik untuk menentukan kekuatan/kandungan obat aktif dalam sediaan." }
+  ],
+  "slide-09": [
+    { q: "Siklus hidup tuma kepala dari telur ke dewasa adalah?", options: ["1 minggu", "2 minggu", "30 hari", "6 bulan"], correct: 2, explanation: "Siklus hidup Pediculus humanus capitis: Telur → Larva → Nimfa → Dewasa = 30 hari." },
+    { q: "Macula serulae (bercak biru-abu) adalah tanda khas infestasi?", options: ["Tuma kepala", "Tuma kemaluan (P. pubis)", "Skabies", "Kutu busuk"], correct: 1, explanation: "Macula serulae: bercak biru-abu 0.5 cm khas pedikulosis pubis (Phthirus pubis)." },
+    { q: "Terapi pilihan untuk Cutaneous Larva Migrans adalah?", options: ["Permethrin 5%", "Albendazol 800 mg/hari 3 hari", "Kortikosteroid topikal", "Acyclovir"], correct: 1, explanation: "Albendazol 800 mg/hari selama 3 hari atau Ivermectin 200 μg/hari 1-2 hari." },
+    { q: "Penyakit filaria yang menyebabkan elephantiasis adalah?", options: ["Ascariasis", "Filariasis (W. bancrofti/B. malayi)", "Strongyloidiasis", "Ancylostomiasis"], correct: 1, explanation: "Filariasis oleh Wuchereria bancrofti atau Brugia malayi dapat menyebabkan elephantiasis (limfedema berat)." },
+    { q: "Reaksi gigitan serangga yang muncul dalam 20 menit pertama adalah?", options: ["Reaksi lambat", "Reaksi cepat", "Reaksi ekstrem", "Reaksi terselubung"], correct: 1, explanation: "Reaksi cepat: muncul dalam 20 menit pertama, berupa urtika, eritema, gatal." }
+  ],
+  "slide-10": [
+    { q: "Berapa lama tungau skabies dapat hidup di luar kulit manusia?", options: ["1 jam", "12 jam", "3 hari", "1 minggu"], correct: 2, explanation: "S. scabiei dapat hidup 2-3 hari di luar kulit manusia pada kondisi lingkungan yang mendukung." },
+    { q: "Dari 4 tanda kardinal skabies, berapa tanda minimum untuk diagnosis?", options: ["1 tanda", "2 tanda", "3 tanda", "Semua 4 tanda"], correct: 1, explanation: "Diagnosis klinis skabies: minimal 2 dari 4 tanda kardinal. Diagnosis pasti: menemukan tungau." },
+    { q: "Tingkat kesembuhan Permethrin 5% cream untuk skabies adalah?", options: ["70%", "85%", "97.8%", "50%"], correct: 2, explanation: "Permethrin 5% cream memiliki tingkat kesembuhan 97.8% (vs Ivermectin oral 70%)." },
+    { q: "Terapi tambahan non-medikamentosa yang penting pada skabies adalah?", options: ["Hanya obati pasien saja", "Obati seluruh anggota keluarga dan cuci pakaian", "Tidak perlu cuci pakaian", "Isolasi pasien selama 1 bulan"], correct: 1, explanation: "Penting untuk mengobati seluruh anggota keluarga yang terkena dan mencuci/jemur pakaian, sprei, handuk." },
+    { q: "Kontraindikasi ivermectin oral untuk skabies adalah?", options: ["Anak >15 tahun", "Ibu hamil, menyusui, anak <15 kg", "Dewasa sehat", "Lansia"], correct: 1, explanation: "Ivermectin oral kontraindikasi: ibu hamil, menyusui, anak <15 kg (<5 tahun)." }
+  ],
+  "slide-11": [
+    { q: "Tumor jinak dari sel Schwann pada nervus vestibularis disebut?", options: ["Lipoma", "Schwannoma (Acoustic neuroma)", "Kolesteatoma", "Meningioma"], correct: 1, explanation: "Schwannoma vestibularis (acoustic neuroma/acoustic neurinoma): tumor jinak sel Schwann nervus VIII." },
+    { q: "'Pearly grey' structure di telinga tengah adalah ciri khas?", options: ["Karsinoma", "Kolesteatoma", "Schwannoma", "Polip"], correct: 1, explanation: "Kolesteatoma: 'pearly grey' structure pada telinga tengah. Bukan neoplasma tapi dapat merusak tulang." },
+    { q: "Papilloma skuamosa telinga disebabkan oleh?", options: ["EBV", "HPV tipe 6 & 11", "HSV", "Adenovirus"], correct: 1, explanation: "Papilloma skuamosa: disebabkan HPV tipe 6 & 11 (tipe low-risk). Hiperkeratosis, papillomatosis, koilositosis." },
+    { q: "Karsinoma nasofaring paling umum di daerah mana?", options: ["Sinus frontal", "Sinus maksilaris (60%)", "Orbita", "Mastoid"], correct: 1, explanation: "Karsinoma sel skuamosa nasal paling sering di sinus maksilaris (60%), dekade 6-7." },
+    { q: "Etiologi utama nasopharyngeal carcinoma adalah?", options: ["HPV", "EBV (Epstein-Barr Virus)", "HBV", "HIV"], correct: 1, explanation: "Nasopharyngeal carcinoma terkait erat dengan EBV (Epstein-Barr Virus) serta faktor lingkungan (merokok, alkohol, makanan asin)." }
+  ],
+  "slide-12": [
+    { q: "Urticaria disebabkan oleh degranulasi sel apa?", options: ["Neutrofil", "Mast cell", "Limfosit", "Eosinofil"], correct: 1, explanation: "Urticaria: degranulasi mast cell → pelepasan histamin, leukotrien, prostaglandin → edema dermal." },
+    { q: "Berapa lama setiap lesi urticaria bertahan pada satu tempat?", options: [">72 jam", "24-48 jam", "<24 jam", ">1 minggu"], correct: 2, explanation: "Setiap lesi urticaria individual bertahan <24 jam di satu tempat. Bila >24 jam, curigai urticaria vaskulitis." },
+    { q: "Dermografisme test positif ditandai dengan?", options: ["Lesi coklat setelah digores", "Linear urticaria dalam 5 menit setelah goresan", "Pustula", "Vesikel"], correct: 1, explanation: "Dermografisme test: gores kulit dengan spatula → linear urticaria dalam 5 menit = positif (simptomatis dermografisme)." },
+    { q: "Emergency treatment untuk anafilaksis adalah?", options: ["Kortikosteroid IV saja", "Adrenalin (epinefrin) 0.3-0.5 mg IM", "Antihistamin oral", "Antibiotik"], correct: 1, explanation: "Adrenalin IM adalah first line untuk anafilaksis. Dosis 0.3-0.5 mg ke otot paha anterolateral, ulang tiap 5-15 menit." },
+    { q: "Terapi third-line untuk urticaria kronik refrakter adalah?", options: ["Antihistamin G2 dosis standar", "Kortikosteroid jangka panjang", "Omalizumab (anti-IgE)", "Antibiotik"], correct: 2, explanation: "Stepwise: H1 antihistamin G2 → ↑ dosis → tambahan → Omalizumab → Siklosporin." }
+  ],
+  "slide-13": [
+    { q: "Urticaria yang dipicu oleh panas, olahraga, dan stres emosional disebut?", options: ["Adrenergin", "Kolinergik", "Surya", "Aquagenik"], correct: 1, explanation: "Urticaria kolinergik: dipicu panas, olahraga, stres emosional. Asetilkolin → mast cell degranulasi." },
+    { q: "Bila lesi urticaria bertahan >24 jam dan meninggalkan hiperpigmentasi, diagnosis yang harus dipertimbangkan adalah?", options: ["Urticaria vaskulitis", "Urticaria kolinergik", "Urticaria dingin", "Urticaria tekanan"], correct: 0, explanation: "Urticaria >24 jam per lesi + hiperpigmentasi residu → curiga urticaria vaskulitis. Perlu biopsi kulit." },
+    { q: "Obat yang sebaiknya dihindari pada urticaria karena dapat memperburuk adalah?", options: ["Antihistamin", "Opioid dan NSAID", "Parasetamol", "Vitamin C"], correct: 1, explanation: "Opioid dan NSAID dapat memperburuk urticaria karena efek non-imun pada mast cell." },
+    { q: "Montelukast adalah?", options: ["H1 antihistamin", "Leukotrien receptor antagonis", "Kortikosteroid", "Beta-agonis"], correct: 1, explanation: "Montelukast: leukotrien receptor antagonis. Add-on therapy untuk urticaria, efektif untuk urticaria induksi aspirin/NSAID." },
+    { q: "Dosis omalizumab untuk urticaria kronik adalah?", options: ["50-100 mg/2 minggu", "150-300 mg/4 minggu SC", "500 mg/hari", "1 g/bulan IV"], correct: 1, explanation: "Omalizumab 150-300 mg subkutan setiap 4 minggu untuk urticaria kronik spontan refrakter." }
+  ],
+  "slide-14": [
+    { q: "Vulnus laseratum adalah luka akibat?", options: ["Tusukan benda tajam", "Kekerasan benda tumpul/goresan", "Gigitan hewan", "Tembakan peluru"], correct: 1, explanation: "Vulnus laseratum: luka akibat kekerasan benda tumpul, goresan, atau jatuh. Dimensi: panjang, lebar, dan dalam." },
+    { q: "Fase remodeling/maturation penyembuhan luka berlangsung selama?", options: ["0-4 hari", "4-21 hari", "21 hari - 2 tahun", "2-5 hari"], correct: 2, explanation: "Fase remodeling: 21 hari hingga 2 tahun. Kolagen tipe III → tipe I, kekuatan maksimal 80% kulit normal." },
+    { q: "Komplikasi penyembuhan luka berupa fibrosis berlebih yang meluas dari batas luka adalah?", options: ["Skar hipertrofik", "Keloid", "Hematoma", "Dehiscence"], correct: 1, explanation: "Keloid: fibrosis berlebih yang melampaui batas luka asli. Skar hipertrofik tetap dalam batas luka." },
+    { q: "Antiseptik yang TIDAK toksik pada jaringan granulasi adalah?", options: ["Hydrogen peroxide", "Povidone iodine (PVP-I)", "Alkohol 70%", "Amoniak"], correct: 1, explanation: "Povidone iodine: spektrum luas, tidak toksik pada jaringan granulasi. Kontraindikasi: hipertiroidisme." },
+    { q: "Dressing yang cocok untuk luka dengan eksudat berat dan bleeding adalah?", options: ["Transparent film", "Alginate", "Hydrocolloid", "Gauze kering"], correct: 1, explanation: "Alginate: absorbsi sangat tinggi, bersifat hemostatik. Cocok untuk luka eksudat berat dan bleeding." }
+  ]
+};
+
+// ===== STATE =====
+let currentView = 'dashboard';
+let currentQuoteIndex = new Date().getDate() - 1;
+if (currentQuoteIndex >= quotes.length) currentQuoteIndex = 0;
+let visitedSlides = JSON.parse(localStorage.getItem('visitedSlides') || '[]');
+let currentFlashcard = 0;
+let flashcardOrder = [...Array(flashcards.length).keys()];
+let examActive = false, examQuestions = [], examAnswers = [], examFlagged = [], examCurrentQ = 0, examTimerInterval, examSeconds = 3600;
+let meditationTimerInterval, meditationSeconds = 300, meditationRunning = false;
+let soundPlaying = { rain: false, water: false };
+let noteSlideId = '';
+let notes = JSON.parse(localStorage.getItem('notes') || '{}');
+let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+let challengeCompleted = JSON.parse(localStorage.getItem('challengeCompleted') || '[]');
+let streak = parseInt(localStorage.getItem('streak') || '0');
+let lastChallengeDate = localStorage.getItem('lastChallengeDate') || '';
+let quizTaken = parseInt(localStorage.getItem('quizTaken') || '0');
+let flashSeen = parseInt(localStorage.getItem('flashSeen') || '0');
+let gamePlayed = parseInt(localStorage.getItem('gamePlayed') || '0');
+
+// ===== AQUARIUM CANVAS =====
+(function initAquarium() {
+  const canvas = document.getElementById('aquarium-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const bubbles = [];
+  for (let i = 0; i < 50; i++) {
+    bubbles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 3 + 1,
+      speed: Math.random() * 0.5 + 0.2,
+      opacity: Math.random() * 0.3 + 0.1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    bubbles.forEach(b => {
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0, 212, 255, ${b.opacity})`;
+      ctx.fill();
+      b.y -= b.speed;
+      if (b.y < -10) { b.y = height + 10; b.x = Math.random() * width; }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ===== NAVIGATION =====
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById(viewId);
+  if (target) target.classList.add('active');
+  currentView = viewId;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navItem = document.getElementById('nav-' + viewId);
+  if (navItem) navItem.classList.add('active');
+  if (viewId.startsWith('slide-') && !visitedSlides.includes(viewId)) {
+    visitedSlides.push(viewId);
+    localStorage.setItem('visitedSlides', JSON.stringify(visitedSlides));
+    updateProgress();
+  }
+  if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('show');
+  document.getElementById('themePanel').classList.remove('show');
+  window.scrollTo(0, 0);
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('show');
+}
+
+// ===== THEME =====
+function toggleThemePanel() {
+  document.getElementById('themePanel').classList.toggle('show');
+}
+
+function setTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  document.querySelectorAll('.theme-option').forEach(t => t.classList.remove('active'));
+  const active = document.querySelector(`[data-theme="${theme}"]`);
+  if (active) active.classList.add('active');
+}
+
+const savedTheme = localStorage.getItem('theme') || 'ocean';
+setTheme(savedTheme);
+
+// ===== ZOOM =====
+function setZoom(val) {
+  document.body.style.zoom = val + '%';
+  const zv = document.getElementById('zoomValue');
+  if (zv) zv.textContent = val + '%';
+  localStorage.setItem('zoom', val);
+}
+const savedZoom = localStorage.getItem('zoom') || 100;
+setZoom(savedZoom);
+const zs = document.getElementById('zoomSlider');
+if (zs) zs.value = savedZoom;
+
+// ===== FULLSCREEN =====
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(e => console.log(e));
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// ===== PROGRESS =====
+function updateProgress() {
+  const total = 14;
+  const visited = visitedSlides.length;
+  const pct = Math.round((visited / total) * 100);
+  const pp = document.getElementById('progressPercent');
+  const pb = document.getElementById('progressBar');
+  const pt = document.getElementById('progressText');
+  const sp = document.getElementById('statProgress');
+  if (pp) pp.textContent = pct + '%';
+  if (pb) pb.style.width = pct + '%';
+  if (pt) pt.textContent = visited + ' dari ' + total + ' materi';
+  if (sp) sp.textContent = pct + '%';
+}
+
+// ===== MOTIVATION =====
+function renderQuote() {
+  const q = quotes[currentQuoteIndex];
+  const qt = document.getElementById('quoteText');
+  const qa = document.getElementById('quoteAuthor');
+  const qd = document.getElementById('quoteDay');
+  if (qt) qt.textContent = '"' + q.text + '"';
+  if (qa) qa.textContent = '- ' + q.author;
+  if (qd) qd.textContent = 'Hari ' + q.day;
+}
+function nextQuote() { currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length; renderQuote(); }
+function prevQuote() { currentQuoteIndex = (currentQuoteIndex - 1 + quotes.length) % quotes.length; renderQuote(); }
+function randomQuote() { currentQuoteIndex = Math.floor(Math.random() * quotes.length); renderQuote(); }
+function goToQuoteDay(day) { currentQuoteIndex = day - 1; renderQuote(); }
+
+const quoteDaysContainer = document.getElementById('quoteDays');
+if (quoteDaysContainer) {
+  for (let i = 1; i <= 30; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'pill-btn';
+    btn.textContent = i;
+    btn.style.minWidth = '42px';
+    btn.style.justifyContent = 'center';
+    btn.onclick = () => goToQuoteDay(i);
+    quoteDaysContainer.appendChild(btn);
+  }
+}
+renderQuote();
+
+// ===== MEDITATION =====
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const s = (seconds % 60).toString().padStart(2, '0');
+  return m + ':' + s;
+}
+
+function startMeditation() {
+  if (meditationRunning) return;
+  meditationRunning = true;
+  const ms = document.getElementById('medStartBtn');
+  const mp = document.getElementById('medPauseBtn');
+  const mst = document.getElementById('meditationStatus');
+  if (ms) ms.style.display = 'none';
+  if (mp) mp.style.display = 'inline-flex';
+  if (mst) mst.textContent = 'Fokus pada napas... Tarik napas dalam-dalam...';
+  meditationTimerInterval = setInterval(() => {
+    meditationSeconds--;
+    const mt = document.getElementById('meditationTimer');
+    if (mt) mt.textContent = formatTime(meditationSeconds);
+    if (meditationSeconds <= 0) {
+      clearInterval(meditationTimerInterval);
+      meditationRunning = false;
+      if (mst) mst.textContent = 'Sesi meditasi selesai. Terima kasih.';
+      if (ms) ms.style.display = 'inline-flex';
+      if (mp) mp.style.display = 'none';
+    }
+  }, 1000);
+}
+
+function pauseMeditation() {
+  clearInterval(meditationTimerInterval);
+  meditationRunning = false;
+  const ms = document.getElementById('medStartBtn');
+  const mp = document.getElementById('medPauseBtn');
+  const mst = document.getElementById('meditationStatus');
+  if (ms) ms.style.display = 'inline-flex';
+  if (mp) mp.style.display = 'none';
+  if (mst) mst.textContent = 'Meditasi dijeda. Klik Mulai untuk melanjutkan.';
+}
+
+function resetMeditation() {
+  clearInterval(meditationTimerInterval);
+  meditationRunning = false;
+  meditationSeconds = 300;
+  const mt = document.getElementById('meditationTimer');
+  const ms = document.getElementById('medStartBtn');
+  const mp = document.getElementById('medPauseBtn');
+  const mst = document.getElementById('meditationStatus');
+  if (mt) mt.textContent = formatTime(meditationSeconds);
+  if (ms) ms.style.display = 'inline-flex';
+  if (mp) mp.style.display = 'none';
+  if (mst) mst.textContent = 'Siap memulai meditasi';
+}
+
+function setMeditationTime(minutes) {
+  clearInterval(meditationTimerInterval);
+  meditationRunning = false;
+  meditationSeconds = minutes * 60;
+  const mt = document.getElementById('meditationTimer');
+  const ms = document.getElementById('medStartBtn');
+  const mp = document.getElementById('medPauseBtn');
+  const mst = document.getElementById('meditationStatus');
+  if (mt) mt.textContent = formatTime(meditationSeconds);
+  if (ms) ms.style.display = 'inline-flex';
+  if (mp) mp.style.display = 'none';
+  if (mst) mst.textContent = 'Waktu: ' + minutes + ' menit. Klik Mulai.';
+}
+
+// ===== SOUND PLAYER =====
+function toggleSound(type) {
+  const audio = document.getElementById(type + '-audio');
+  const card = document.getElementById(type + 'Card');
+  const status = document.getElementById(type + 'Status');
+  if (!audio) return;
+  if (soundPlaying[type]) {
+    audio.pause();
+    soundPlaying[type] = false;
+    if (card) card.classList.remove('playing');
+    if (status) status.textContent = 'Tap untuk memutar';
+  } else {
+    audio.play().catch(e => console.log('Audio play failed:', e));
+    soundPlaying[type] = true;
+    if (card) card.classList.add('playing');
+    if (status) status.textContent = '▶ Sedang diputar';
+  }
+}
+
+function setVolume(type, val) {
+  const audio = document.getElementById(type + '-audio');
+  if (audio) audio.volume = val / 100;
+}
+
+// ===== FLASHCARDS =====
+function renderFlashcard() {
+  const idx = flashcardOrder[currentFlashcard];
+  const ff = document.getElementById('flashFrontText');
+  const fb = document.getElementById('flashBackText');
+  const fp = document.getElementById('flashProgress');
+  if (ff) ff.textContent = flashcards[idx].front;
+  if (fb) fb.textContent = flashcards[idx].back;
+  if (fp) fp.textContent = (currentFlashcard + 1) + ' dari ' + flashcards.length + ' kartu';
+  const fc = document.getElementById('flashCard');
+  if (fc) fc.classList.remove('flipped');
+}
+
+function flipCard() {
+  const fc = document.getElementById('flashCard');
+  if (fc) fc.classList.toggle('flipped');
+}
+
+function nextCard() {
+  currentFlashcard = (currentFlashcard + 1) % flashcards.length;
+  renderFlashcard();
+  flashSeen++;
+  localStorage.setItem('flashSeen', flashSeen);
+  const sf = document.getElementById('statFlash');
+  if (sf) sf.textContent = flashSeen;
+}
+
+function prevCard() {
+  currentFlashcard = (currentFlashcard - 1 + flashcards.length) % flashcards.length;
+  renderFlashcard();
+}
+
+function shuffleCards() {
+  for (let i = flashcardOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [flashcardOrder[i], flashcardOrder[j]] = [flashcardOrder[j], flashcardOrder[i]];
+  }
+  currentFlashcard = 0;
+  renderFlashcard();
+}
+renderFlashcard();
+
+// ===== WORD GUESS GAME =====
+let currentWordObj = null;
+let guessedLetters = [];
+let wrongGuesses = 0;
+const maxWrong = 5;
+
+function initWordGuess() {
+  currentWordObj = wordGuessWords[Math.floor(Math.random() * wordGuessWords.length)];
+  guessedLetters = [];
+  wrongGuesses = 0;
+  renderWordGuess();
+  renderWordKeyboard();
+  const ws = document.getElementById('wordguessStatus');
+  const wh = document.getElementById('wordguessHintText');
+  if (ws) { ws.textContent = ''; ws.className = 'wordguess-status'; }
+  if (wh) wh.textContent = currentWordObj.hint;
+}
+
+function renderWordGuess() {
+  const container = document.getElementById('wordguessWord');
+  if (!container) return;
+  container.innerHTML = '';
+  const word = currentWordObj.word;
+  let allRevealed = true;
+  for (let c of word) {
+    const div = document.createElement('div');
+    div.className = 'wordguess-letter';
+    if (guessedLetters.includes(c)) {
+      div.classList.add('revealed');
+      div.textContent = c;
+    } else {
+      allRevealed = false;
+    }
+    container.appendChild(div);
+  }
+  updateHangman();
+  const ws = document.getElementById('wordguessStatus');
+  if (allRevealed && wrongGuesses < maxWrong) {
+    if (ws) { ws.textContent = '🎉 Benar! Kata: ' + word; ws.className = 'wordguess-status win'; }
+    gamePlayed++;
+    localStorage.setItem('gamePlayed', gamePlayed);
+    const sg = document.getElementById('statGames');
+    if (sg) sg.textContent = gamePlayed;
+  } else if (wrongGuesses >= maxWrong) {
+    if (ws) { ws.textContent = '💔 Game Over! Kata: ' + word; ws.className = 'wordguess-status lose'; }
+  }
+}
+
+function renderWordKeyboard() {
+  const container = document.getElementById('wordguessKeyboard');
+  if (!container) return;
+  container.innerHTML = '';
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for (let c of letters) {
+    const btn = document.createElement('button');
+    btn.className = 'wordguess-key';
+    btn.textContent = c;
+    if (guessedLetters.includes(c)) {
+      btn.classList.add('used');
+      if (currentWordObj.word.includes(c)) btn.classList.add('correct');
+      else btn.classList.add('wrong');
+    }
+    btn.onclick = () => guessLetter(c);
+    container.appendChild(btn);
+  }
+}
+
+function guessLetter(letter) {
+  if (!currentWordObj || guessedLetters.includes(letter) || wrongGuesses >= maxWrong) return;
+  guessedLetters.push(letter);
+  if (!currentWordObj.word.includes(letter)) wrongGuesses++;
+  renderWordGuess();
+  renderWordKeyboard();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (currentView !== 'wordguess') return;
+  const c = e.key.toUpperCase();
+  if (/[A-Z]/.test(c)) guessLetter(c);
+});
+
+function updateHangman() {
+  const hearts = '❤️'.repeat(Math.max(0, maxWrong - wrongGuesses));
+  const skull = wrongGuesses > 0 ? '☠️ ' : '';
+  const hd = document.getElementById('hangmanDisplay');
+  if (hd) hd.textContent = skull + hearts;
+}
+
+initWordGuess();
+
+// ===== QUIZ ENGINE =====
+function showQuiz(slideId) {
+  const container = document.getElementById('quiz-' + slideId);
+  if (!container) return;
+  const questions = quizData[slideId];
+  if (!questions || questions.length === 0) {
+    container.innerHTML = '<div class="info-card warning"><div class="info-card-body">Quiz untuk materi ini sedang dalam pengembangan.</div></div>';
+    return;
+  }
+  let html = '<h3 style="color:var(--accent);margin:1.5rem 0 1rem;">📝 Quiz Interaktif</h3>';
+  questions.forEach((q, idx) => {
+    html += `<div class="quiz-card" id="quiz-${slideId}-${idx}">
+      <div class="quiz-question">${idx + 1}. ${q.q}</div>
+      <div class="quiz-options">`;
+    q.options.forEach((opt, oidx) => {
+      html += `<div class="quiz-option" onclick="selectOption('${slideId}', ${idx}, ${oidx}, ${q.correct}, '${q.explanation.replace(/'/g, "\\'")}')">
+        <span class="opt-letter">${String.fromCharCode(65 + oidx)}</span>
+        <span>${opt}</span>
+      </div>`;
+    });
+    html += `</div><div class="quiz-explanation" id="exp-${slideId}-${idx}"></div></div>`;
+  });
+  container.innerHTML = html;
+  container.scrollIntoView({ behavior: 'smooth' });
+  quizTaken++;
+  localStorage.setItem('quizTaken', quizTaken);
+  const sq = document.getElementById('statQuiz');
+  if (sq) sq.textContent = quizTaken;
+}
+
+function selectOption(slideId, qidx, oidx, correct, explanation) {
+  const card = document.getElementById('quiz-' + slideId + '-' + qidx);
+  if (!card) return;
+  const options = card.querySelectorAll('.quiz-option');
+  options.forEach((opt, i) => {
+    opt.classList.add('disabled');
+    if (i === correct) opt.classList.add('correct');
+    else if (i === oidx && i !== correct) opt.classList.add('wrong');
+  });
+  const exp = document.getElementById('exp-' + slideId + '-' + qidx);
+  if (exp) {
+    exp.innerHTML = '<strong>Penjelasan:</strong> ' + explanation;
+    exp.classList.add('show');
+  }
+}
+
+// ===== EXAM SIMULATOR =====
+function startExam() {
+  examActive = true;
+  examSeconds = 3600;
+  examAnswers = [];
+  examFlagged = [];
+  examCurrentQ = 0;
+  const allQuestions = [];
+  Object.keys(quizData).forEach(key => {
+    quizData[key].forEach(q => {
+      allQuestions.push({ ...q, source: key });
+    });
+  });
+  examQuestions = [];
+  while (examQuestions.length < 20 && allQuestions.length > 0) {
+    const r = Math.floor(Math.random() * allQuestions.length);
+    examQuestions.push(allQuestions.splice(r, 1)[0]);
+  }
+  examAnswers = new Array(examQuestions.length).fill(null);
+  examFlagged = new Array(examQuestions.length).fill(false);
+  showView('exam');
+  renderExamQuestion();
+  renderExamNav();
+  startExamTimer();
+}
+
+function startExamTimer() {
+  clearInterval(examTimerInterval);
+  const timer = document.getElementById('examTimer');
+  examTimerInterval = setInterval(() => {
+    examSeconds--;
+    if (timer) {
+      const m = Math.floor(examSeconds / 60).toString().padStart(2, '0');
+      const s = (examSeconds % 60).toString().padStart(2, '0');
+      timer.textContent = m + ':' + s;
+      if (examSeconds < 300) timer.classList.add('danger');
+      else if (examSeconds < 600) timer.classList.add('warning');
+    }
+    if (examSeconds <= 0) finishExam();
+  }, 1000);
+}
+
+function renderExamQuestion() {
+  const container = document.getElementById('examQuestionContainer');
+  const q = examQuestions[examCurrentQ];
+  if (!container || !q) return;
+  let html = `<div class="quiz-card">
+    <div class="quiz-question">${examCurrentQ + 1}. ${q.q}</div>
+    <div class="quiz-options">`;
+  q.options.forEach((opt, idx) => {
+    const isSelected = examAnswers[examCurrentQ] === idx;
+    const cls = isSelected ? 'quiz-option correct' : 'quiz-option';
+    html += `<div class="${cls}" onclick="selectExamOption(${idx})">
+      <span class="opt-letter">${String.fromCharCode(65 + idx)}</span>
+      <span>${opt}</span>
+    </div>`;
+  });
+  html += '</div></div>';
+  container.innerHTML = html;
+  const ec = document.getElementById('examCurrent');
+  const et = document.getElementById('examTotal');
+  if (ec) ec.textContent = examCurrentQ + 1;
+  if (et) et.textContent = examQuestions.length;
+  updateExamNav();
+}
+
+function selectExamOption(idx) {
+  examAnswers[examCurrentQ] = idx;
+  renderExamQuestion();
+  updateExamNav();
+}
+
+function prevExamQuestion() {
+  if (examCurrentQ > 0) {
+    examCurrentQ--;
+    renderExamQuestion();
+  }
+}
+
+function nextExamQuestion() {
+  if (examCurrentQ < examQuestions.length - 1) {
+    examCurrentQ++;
+    renderExamQuestion();
+  }
+}
+
+function flagQuestion() {
+  examFlagged[examCurrentQ] = !examFlagged[examCurrentQ];
+  updateExamNav();
+  const fb = document.getElementById('flagBtn');
+  if (fb) fb.style.background = examFlagged[examCurrentQ] ? 'var(--warning)' : '';
+}
+
+function renderExamNav() {
+  const nav = document.getElementById('examNav');
+  if (!nav) return;
+  let html = '';
+  for (let i = 0; i < examQuestions.length; i++) {
+    let cls = '';
+    if (i === examCurrentQ) cls = 'active';
+    else if (examAnswers[i] !== null) cls = 'answered';
+    if (examFlagged[i]) cls += ' flagged';
+    html += `<button class="${cls}" onclick="jumpToQuestion(${i})">${i + 1}</button>`;
+  }
+  nav.innerHTML = html;
+}
+
+function updateExamNav() {
+  renderExamNav();
+}
+
+function jumpToQuestion(idx) {
+  examCurrentQ = idx;
+  renderExamQuestion();
+}
+
+function finishExam() {
+  clearInterval(examTimerInterval);
+  examActive = false;
+  let correct = 0;
+  examAnswers.forEach((ans, i) => {
+    if (ans === examQuestions[i].correct) correct++;
+  });
+  const score = Math.round((correct / examQuestions.length) * 100);
+  showView('exam-result');
+  const sc = document.getElementById('scoreCircle');
+  const rd = document.getElementById('resultDetails');
+  if (sc) {
+    sc.setAttribute('data-score', score + '%');
+    sc.style.setProperty('--score-deg', (score * 3.6) + 'deg');
+  }
+  if (rd) {
+    rd.innerHTML = `
+      <div style="font-size:1.2rem;margin-bottom:0.5rem;">Benar: <strong style="color:var(--success);">${correct}</strong> dari ${examQuestions.length} soal</div>
+      <div style="font-size:1.2rem;margin-bottom:0.5rem;">Salah: <strong style="color:var(--danger);">${examQuestions.length - correct}</strong> soal</div>
+      <div style="font-size:1.2rem;margin-bottom:0.5rem;">Tidak dijawab: <strong style="color:var(--warning);">${examAnswers.filter(a => a === null).length}</strong> soal</div>
+      <div style="margin-top:1rem;padding:1rem;background:var(--accent-glow);border-radius:var(--radius-sm);">
+        ${score >= 80 ? '🎉 Luar biasa! Kamu siap ujian!' : score >= 60 ? '👍 Bagus! Tingkatkan lagi!' : '💪 Jangan menyerah! Pelajari lagi materinya.'}
+      </div>
+    `;
+  }
+}
+
+function reviewExam() {
+  showView('exam');
+  examCurrentQ = 0;
+  renderExamQuestion();
+}
+
+// ===== POMODORO =====
+let pomoInterval, pomoSeconds = 25 * 60, pomoRunning = false, pomoMode = 'focus';
+const pomoTimes = { focus: 25 * 60, short: 5 * 60, long: 15 * 60 };
+
+function togglePomodoro() {
+  const w = document.getElementById('pomodoroWidget');
+  if (w) w.classList.toggle('collapsed');
+}
+
+function setPomoMode(mode, btn) {
+  pomoMode = mode;
+  pomoSeconds = pomoTimes[mode];
+  pomoRunning = false;
+  clearInterval(pomoInterval);
+  updatePomoDisplay();
+  const label = document.getElementById('pomoLabel');
+  const texts = { focus: 'Focus Time', short: 'Short Break', long: 'Long Break' };
+  if (label) label.textContent = texts[mode];
+  document.querySelectorAll('.pomo-controls button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function updatePomoDisplay() {
+  const pt = document.getElementById('pomoTime');
+  const pp = document.getElementById('pomoProgress');
+  if (pt) pt.textContent = formatTime(pomoSeconds);
+  if (pp) {
+    const total = pomoTimes[pomoMode];
+    const offset = 283 - (pomoSeconds / total) * 283;
+    pp.style.strokeDashoffset = offset;
+  }
+}
+
+function startPomodoro() {
+  if (pomoRunning) return;
+  pomoRunning = true;
+  pomoInterval = setInterval(() => {
+    pomoSeconds--;
+    updatePomoDisplay();
+    if (pomoSeconds <= 0) {
+      clearInterval(pomoInterval);
+      pomoRunning = false;
+      const audio = document.getElementById('pomo-audio');
+      if (audio) { audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZSA0PVanu8LdnGgU1k9n1unEiBC13yO/eizEIHWq+8+OZ'; audio.play().catch(()=>{}); }
+      alert('Waktu habis!');
+    }
+  }, 1000);
+}
+
+function pausePomodoro() {
+  clearInterval(pomoInterval);
+  pomoRunning = false;
+}
+
+function resetPomodoro() {
+  clearInterval(pomoInterval);
+  pomoRunning = false;
+  pomoSeconds = pomoTimes[pomoMode];
+  updatePomoDisplay();
+}
+updatePomoDisplay();
+
+// ===== MUSIC PLAYER =====
+let musicPlaylist = [];
+let currentTrack = -1;
+let musicAudio = null;
+let musicPlaying = false;
+
+function toggleMusicPlayer() {
+  const mp = document.getElementById('musicPlayer');
+  if (mp) mp.classList.toggle('collapsed');
+}
+
+function loadMusic(event) {
+  const files = Array.from(event.target.files);
+  files.forEach(file => {
+    const url = URL.createObjectURL(file);
+    musicPlaylist.push({ name: file.name, url: url });
+  });
+  renderPlaylist();
+  if (currentTrack === -1 && musicPlaylist.length > 0) {
+    loadTrack(0);
+  }
+}
+
+function renderPlaylist() {
+  const pl = document.getElementById('playerPlaylist');
+  if (!pl) return;
+  pl.innerHTML = '';
+  musicPlaylist.forEach((track, i) => {
+    const div = document.createElement('div');
+    div.className = 'player-playlist-item' + (i === currentTrack ? ' active' : '');
+    div.textContent = track.name;
+    div.onclick = () => loadTrack(i);
+    pl.appendChild(div);
+  });
+}
+
+function loadTrack(idx) {
+  currentTrack = idx;
+  if (musicAudio) musicAudio.pause();
+  musicAudio = new Audio(musicPlaylist[idx].url);
+  musicAudio.addEventListener('timeupdate', updateMusicProgress);
+  musicAudio.addEventListener('ended', nextTrack);
+  const pt = document.getElementById('playerTrack');
+  if (pt) pt.textContent = musicPlaylist[idx].name;
+  renderPlaylist();
+  togglePlay();
+}
+
+function togglePlay() {
+  if (!musicAudio) return;
+  const btn = document.getElementById('playBtn');
+  const vis = document.getElementById('playerVisualizer');
+  const topBars = document.getElementById('topMusicBars');
+  if (musicPlaying) {
+    musicAudio.pause();
+    musicPlaying = false;
+    if (btn) btn.textContent = '▶';
+    if (vis) vis.classList.add('paused');
+    if (topBars) topBars.classList.add('paused');
+  } else {
+    musicAudio.play().catch(e => console.log(e));
+    musicPlaying = true;
+    if (btn) btn.textContent = '⏸';
+    if (vis) vis.classList.remove('paused');
+    if (topBars) topBars.classList.remove('paused');
+  }
+}
+
+function prevTrack() {
+  if (musicPlaylist.length === 0) return;
+  let idx = currentTrack - 1;
+  if (idx < 0) idx = musicPlaylist.length - 1;
+  loadTrack(idx);
+}
+
+function nextTrack() {
+  if (musicPlaylist.length === 0) return;
+  let idx = currentTrack + 1;
+  if (idx >= musicPlaylist.length) idx = 0;
+  loadTrack(idx);
+}
+
+function updateMusicProgress() {
+  if (!musicAudio) return;
+  const pct = (musicAudio.currentTime / musicAudio.duration) * 100;
+  const bar = document.getElementById('playerProgress');
+  if (bar) bar.style.width = pct + '%';
+}
+
+function seekMusic(event) {
+  if (!musicAudio) return;
+  const rect = event.currentTarget.getBoundingClientRect();
+  const pct = (event.clientX - rect.left) / rect.width;
+  musicAudio.currentTime = pct * musicAudio.duration;
+}
+
+// ===== BOOKMARKS =====
+function toggleBookmarkPanel() {
+  const bp = document.getElementById('bookmarkPanel');
+  if (bp) bp.classList.toggle('active');
+  renderBookmarks();
+}
+
+function addBookmark() {
+  const title = document.querySelector('.content-header h1')?.textContent || 'Halaman ini';
+  const view = currentView;
+  const time = new Date().toLocaleString('id-ID');
+  bookmarks.push({ title, view, time, id: Date.now() });
+  localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+  renderBookmarks();
+  alert('Bookmark ditambahkan!');
+}
+
+function renderBookmarks() {
+  const bl = document.getElementById('bookmarkList');
+  if (!bl) return;
+  if (bookmarks.length === 0) {
+    bl.innerHTML = '<div style="color:var(--text-2);font-size:0.85rem;text-align:center;">Belum ada bookmark</div>';
+    return;
+  }
+  bl.innerHTML = '';
+  bookmarks.forEach(bm => {
+    const div = document.createElement('div');
+    div.className = 'bookmark-item';
+    div.innerHTML = `<div class="bm-title">${bm.title}</div><div class="bm-meta">${bm.time}</div>`;
+    div.onclick = () => showView(bm.view);
+    bl.appendChild(div);
+  });
+}
+
+// ===== NOTES =====
+function openNote(slideId) {
+  noteSlideId = slideId;
+  const modal = document.getElementById('noteModal');
+  const textarea = document.getElementById('noteText');
+  if (modal) modal.classList.add('active');
+  if (textarea) textarea.value = notes[slideId] || '';
+}
+
+function closeNote() {
+  const modal = document.getElementById('noteModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function saveNote() {
+  const textarea = document.getElementById('noteText');
+  if (textarea && noteSlideId) {
+    notes[noteSlideId] = textarea.value;
+    localStorage.setItem('notes', JSON.stringify(notes));
+    const sn = document.getElementById('statNotes');
+    if (sn) sn.textContent = Object.keys(notes).length;
+  }
+  closeNote();
+}
+
+// ===== SEARCH =====
+function performSearch() {
+  const input = document.getElementById('searchInput');
+  const term = input?.value.toLowerCase().trim();
+  if (!term) return;
+  const slides = ['slide-01','slide-02','slide-03','slide-04','slide-05','slide-06','slide-07','slide-08','slide-09','slide-10','slide-11','slide-12','slide-13','slide-14'];
+  for (const slide of slides) {
+    const el = document.getElementById(slide);
+    if (el && el.textContent.toLowerCase().includes(term)) {
+      showView(slide);
+      setTimeout(() => {
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+        let node;
+        while (node = walker.nextNode()) {
+          if (node.textContent.toLowerCase().includes(term)) {
+            const range = document.createRange();
+            range.selectNode(node);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            node.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            break;
+          }
+        }
+      }, 500);
+      return;
+    }
+  }
+  alert('Materi tidak ditemukan untuk kata kunci: ' + term);
+}
+
+// ===== HIGHLIGHT =====
+let savedRange = null;
+
+document.addEventListener('mouseup', function(e) {
+  const selection = window.getSelection();
+  if (selection.toString().length > 0) {
+    const tooltip = document.getElementById('tooltipBar');
+    if (tooltip) {
+      tooltip.style.display = 'flex';
+      tooltip.style.left = e.pageX + 'px';
+      tooltip.style.top = (e.pageY - 40) + 'px';
+      savedRange = selection.getRangeAt(0);
+    }
+  } else {
+    const tooltip = document.getElementById('tooltipBar');
+    if (tooltip && !tooltip.contains(e.target)) tooltip.style.display = 'none';
+  }
+});
+
+function highlightSelection(color) {
+  if (!savedRange) return;
+  const span = document.createElement('span');
+  span.className = 'highlight-' + color;
+  try {
+    savedRange.surroundContents(span);
+  } catch (e) {
+    console.log('Highlight failed', e);
+  }
+  const tooltip = document.getElementById('tooltipBar');
+  if (tooltip) tooltip.style.display = 'none';
+  window.getSelection().removeAllRanges();
+}
+
+function removeHighlight() {
+  const selection = window.getSelection();
+  if (selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
+    let el = range.commonAncestorContainer;
+    if (el.nodeType === 3) el = el.parentElement;
+    const classes = ['highlight-yellow', 'highlight-green', 'highlight-blue', 'highlight-pink'];
+    classes.forEach(c => {
+      if (el.classList.contains(c)) {
+        const parent = el.parentNode;
+        while (el.firstChild) parent.insertBefore(el.firstChild, el);
+        parent.removeChild(el);
+      }
+    });
+  }
+  const tooltip = document.getElementById('tooltipBar');
+  if (tooltip) tooltip.style.display = 'none';
+}
+
+// ===== EXPORT =====
+function exportProgress() {
+  const data = {
+    visitedSlides,
+    quizTaken,
+    flashSeen,
+    gamePlayed,
+    bookmarks,
+    notes: Object.keys(notes).length,
+    streak,
+    timestamp: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dermalearn-progress.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== DAILY CHALLENGE =====
+function completeTask(taskNum) {
+  const today = new Date().toDateString();
+  if (lastChallengeDate !== today) {
+    challengeCompleted = [];
+    lastChallengeDate = today;
+  }
+  if (!challengeCompleted.includes(taskNum)) {
+    challengeCompleted.push(taskNum);
+    localStorage.setItem('challengeCompleted', JSON.stringify(challengeCompleted));
+    localStorage.setItem('lastChallengeDate', lastChallengeDate);
+    const btn = document.getElementById('task' + taskNum);
+    if (btn) {
+      btn.style.background = 'var(--success)';
+      btn.style.color = '#fff';
+      btn.style.borderColor = 'var(--success)';
+    }
+    if (challengeCompleted.length >= 3) {
+      streak++;
+      localStorage.setItem('streak', streak);
+      const sb = document.getElementById('streakBadge');
+      if (sb) sb.textContent = '🔥 Streak ' + streak + ' hari';
+    }
+  }
+}
+
+function initChallenge() {
+  const today = new Date().toDateString();
+  if (lastChallengeDate !== today) {
+    challengeCompleted = [];
+  }
+  challengeCompleted.forEach(t => {
+    const btn = document.getElementById('task' + t);
+    if (btn) {
+      btn.style.background = 'var(--success)';
+      btn.style.color = '#fff';
+      btn.style.borderColor = 'var(--success)';
+    }
+  });
+  const sb = document.getElementById('streakBadge');
+  if (sb) sb.textContent = '🔥 Streak ' + streak + ' hari';
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  updateProgress();
+  initChallenge();
+  const sq = document.getElementById('statQuiz');
+  const sf = document.getElementById('statFlash');
+  const sn = document.getElementById('statNotes');
+  const sg = document.getElementById('statGames');
+  if (sq) sq.textContent = quizTaken;
+  if (sf) sf.textContent = flashSeen;
+  if (sn) sn.textContent = Object.keys(notes).length;
+  if (sg) sg.textContent = gamePlayed;
+});
+
+// Dummy audio elements to prevent errors
+const rainAudio = document.getElementById('rain-audio');
+const waterAudio = document.getElementById('water-audio');
+if (rainAudio) rainAudio.volume = 0.5;
+if (waterAudio) waterAudio.volume = 0.5;
+</script>
+
+</body>
+</html>
